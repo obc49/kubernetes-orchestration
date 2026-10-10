@@ -1,0 +1,1 @@
+"""Training Flask application package."""
