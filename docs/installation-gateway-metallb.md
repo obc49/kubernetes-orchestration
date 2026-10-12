@@ -73,16 +73,16 @@ kubectl -n kube-training describe gateway flask-gateway
 kubectl -n kube-training describe httproute flask-route
 ```
 
-Pour tester la route avant l’installation de MetalLB, utiliser le port-forward vers le Service de données NGINX. Vérifier d’abord son nom et ses ports :
+Après avoir créé la Gateway et l’HTTPRoute, le Service de données est créé dans le namespace de la Gateway (`kube-training`). Dans l’environnement de formation, son nom est `flask-gateway-nginx`. Vérifier son nom et ses ports avant le port-forward :
 
 ```bash
-kubectl -n nginx-gateway get svc
+kubectl -n kube-training get svc
 ```
 
-Dans un terminal dédié, remplacer le nom du Service si le chart utilise un nom différent :
+Dans un terminal dédié, transférer le port vers le Service de données associé à la Gateway :
 
 ```bash
-kubectl -n nginx-gateway port-forward svc/ngf-nginx-gateway-fabric 8080:80
+kubectl -n kube-training port-forward svc/flask-gateway-nginx 8080:80
 ```
 
 Puis dans un autre terminal :
@@ -93,7 +93,7 @@ curl -i -H 'Host: flask.local' http://localhost:8080/health
 curl -i -H 'Host: flask.local' http://localhost:8080/ready
 ```
 
-Si le nom du Service n’est pas celui indiqué dans la commande, utiliser le nom observé par `kubectl get svc`. Si l’implémentation de Gateway ne requiert pas de Host particulier, le header peut être omis.
+Si le nom du Service diffère dans la version installée, utiliser le Service de données NGINX créé pour `flask-gateway`, pas le Service du contrôleur. Si l’implémentation de Gateway ne requiert pas de Host particulier, le header peut être omis.
 
 ## 5. Installer MetalLB (TP06)
 
