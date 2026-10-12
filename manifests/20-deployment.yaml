@@ -15,9 +15,11 @@ spec:
       labels:
         app.kubernetes.io/name: flask-app
     spec:
+      imagePullSecrets:
+        - name: ghcr-pull
       containers:
         - name: flask-app
-          image: kubernetes-orchestration:training
+          image: ghcr.io/oboyo-training/kubernetes-orchestration:sha-aec4ca1
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
