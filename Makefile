@@ -1,4 +1,4 @@
-.PHONY: test build run cluster apply gateway metallb delete
+.PHONY: test build run cluster apply gateway delete
 
 CLUSTER ?= kube-training
 
@@ -16,7 +16,7 @@ cluster:
 
 apply:
 	kubectl apply -f manifests/00-namespace.yaml
-	@kubectl -n kube-training get secret ghcr-pull >/dev/null 2>&1 || { echo "Secret ghcr-pull manquant : suivre tp/TP03-authentification-ghcr.md"; exit 1; }
+	@kubectl -n kube-training get secret ghcr-pull >/dev/null 2>&1 || { echo "Secret ghcr-pull manquant : suivre tp/TP02-ghcr-image-privee.md"; exit 1; }
 	kubectl apply -f manifests/10-configmap.yaml
 	kubectl apply -f manifests/20-deployment.yaml
 	kubectl apply -f manifests/30-service.yaml
@@ -25,9 +25,6 @@ apply:
 gateway:
 	kubectl apply -f manifests/40-gateway.yaml
 	kubectl apply -f manifests/50-httproute.yaml
-
-metallb:
-	kubectl apply -f manifests/60-metallb-config.yaml
 
 delete:
 	kind delete cluster --name $(CLUSTER)
