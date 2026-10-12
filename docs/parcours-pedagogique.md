@@ -12,7 +12,7 @@ Formation de deux jours, 7 heures effectives par jour (420 minutes). Fil rouge :
 | 4. Registre et authentification | GHCR, tags immuables, visibilité privée, token minimal et Secret de pull | 65 min | TP02 |
 | 5. Objets et réseau Kubernetes | Namespace, Pod, ReplicaSet, Deployment, labels/selectors, Service, endpoints, port-forward | 125 min | TP03 |
 | 6. Récapitulatif | Questions, erreurs fréquentes, vérification des acquis | 20 min | TP01–TP03 |
-| 7. Marge pédagogique | Pause active ou approfondissement guidé sans créer de TP supplémentaire | 60 min | Selon le groupe |
+| 7. Atelier d’architecture observable | Explorer les namespaces système, les Pods du control plane visibles dans Kind, les nœuds et les événements ; relier les objets observés au schéma d’architecture | 60 min | Démonstration guidée |
 
 **Total jour 1 : 420 minutes.** Les pauses légales/logistiques sont à organiser en dehors des 7 heures effectives si le cadre de la session les exclut.
 
