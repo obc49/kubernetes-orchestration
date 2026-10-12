@@ -28,7 +28,7 @@ kubectl -n kube-training describe httproute flask-route
 kubectl -n kube-training get endpoints flask-app
 ```
 
-Le guide explique comment choisir le Service NGINX à utiliser pour le port-forward. Ouvrir un second terminal pour les requêtes HTTP.
+Après avoir créé la Gateway, le Service de données NGINX associé est normalement `flask-gateway-nginx` dans le namespace `kube-training`. Vérifier son nom avec `kubectl -n kube-training get svc`, puis utiliser le port-forward documenté dans le guide formateur. Ne pas transférer le port vers le Service du contrôleur dans `nginx-gateway`. Ouvrir un second terminal pour les requêtes HTTP.
 
 ## En cas d’échec
 
