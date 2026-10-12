@@ -1,28 +1,29 @@
 # Kubernetes Orchestration — projet fil rouge
 
-Projet pédagogique pour la formation **Kubernetes – Orchestration des conteneurs** (14 heures, deux jours). Le dépôt conserve **six TP apprenants, TP01 à TP06**.
+Projet pédagogique pour la formation **Kubernetes – Orchestration des conteneurs** (14 heures, deux jours). Le dépôt conserve exactement **six TP apprenants, TP01 à TP06**.
 
 ## Parcours des six TP
 
 | TP | Sujet | Résultat attendu |
 |---|---|---|
 | [TP01](tp/TP01-application-conteneur.md) | Application et conteneur Docker | Application testée localement et image construite |
-| [TP02](tp/TP02-ghcr-image-privee.md) | Image privée sur GHCR | Image publiée et tag de formation identifié |
-| [TP03](tp/TP03-authentification-ghcr.md) | Authentification au registre | Secret `ghcr-pull` créé dans le bon namespace |
-| [TP04](tp/TP04-objets-kubernetes-port-forward.md) | Objets Kubernetes et port-forward | Application déployée, Service testé |
-| [TP05](tp/TP05-gateway-api.md) | Gateway API et NGINX Gateway Fabric | Route HTTP acceptée et fonctionnelle |
-| [TP06](tp/TP06-loadbalancer-metallb.md) | LoadBalancer local avec MetalLB | Accès externe au laboratoire et vérifications finales |
+| [TP02](tp/TP02-ghcr-image-privee.md) | Image privée GHCR et authentification | Image identifiée et Secret `ghcr-pull` créé dans le bon namespace |
+| [TP03](tp/TP03-pod-deployment-service.md) | Pod, Deployment, Service et port-forward | Application déployée et accessible en local |
+| [TP04](tp/TP04-configuration-ressources-noeuds.md) | Configuration, ressources, placement et stockage | ConfigMap/Secret compris, requests/limits et placement analysés |
+| [TP05](tp/TP05-administration-diagnostic-securite.md) | Administration, diagnostic et sécurité | Incident diagnostiqué avec kubectl et contrôles de sécurité expliqués |
+| [TP06](tp/TP06-gateway-api.md) | Gateway API et NGINX Gateway Fabric | Route HTTP fonctionnelle depuis l’hôte |
 
-FluxCD et Vault + External Secrets Operator sont des **bonus hors socle**.
+FluxCD et Vault + External Secrets Operator restent des **bonus hors socle**. MetalLB n’est pas utilisé dans le parcours.
 
-## Prérequis
+## Prérequis et outillage
 
+- Bases Linux, TCP/IP, virtualisation et conteneurs.
 - Git, Docker Engine (Docker Desktop sous Windows/macOS ou Docker Engine sous Linux), `kubectl`, Kind, Helm 3 et `curl`.
-- Bash recommandé. Sous Windows, utiliser Ubuntu/WSL2 avec Docker Desktop ou un moteur Docker fonctionnel.
+- Bash recommandé. Sous Windows, utiliser Ubuntu/WSL2 avec un moteur Docker fonctionnel.
 - Python 3.11+ uniquement pour tester l’application hors conteneur.
 - Accès Internet pour récupérer les images et les charts.
 
-Les commandes du dépôt sont des commandes Bash. Les comportements d’accès réseau peuvent différer selon l’OS ; le guide d’installation détaille les points de contrôle.
+Kind est l’environnement pratique commun. Minikube et kubeadm sont présentés comme options d’installation, sans demander aux participants d’installer plusieurs clusters.
 
 ## Tester l’application et construire l’image
 
@@ -46,20 +47,18 @@ docker rm -f kube-training-test
 
 ## Image GHCR privée
 
-Le workflow [publish-ghcr.yml](.github/workflows/publish-ghcr.yml) publie l’image lors d’un push sur `main`, avec un tag SHA et `latest`. La visibilité privée du package doit être vérifiée dans les paramètres GitHub Packages ; le workflow ne définit pas cette visibilité à lui seul.
+Le workflow [publish-ghcr.yml](.github/workflows/publish-ghcr.yml) publie l’image lors d’un push sur `main`, avec un tag SHA et `latest`. La visibilité privée du package doit être vérifiée dans GitHub Packages ; le workflow ne définit pas cette visibilité à lui seul.
 
-Pour le cours, utiliser le tag de formation documenté dans TP02 et ne pas supposer que `latest` est immuable. Créer le Secret `ghcr-pull` dans le namespace `kube-training` avant de déployer le Deployment. Ne jamais versionner de token.
+Pour le cours, utiliser le tag d’image validé par le formateur. Créer le Secret `ghcr-pull` dans le namespace `kube-training` avant de déployer le Deployment. Ne jamais versionner de token.
 
-## Déploiement Kubernetes
-
-Créer le cluster avec la configuration du dépôt :
+## Déploiement local
 
 ```bash
 kind create cluster --config kind/cluster.yaml --wait 120s
 kubectl get nodes -o wide
 ```
 
-Suivre les TP dans l’ordre. TP03 crée le Secret de pull ; TP04 déploie ensuite Namespace, ConfigMap, Deployment et Service. Attendre le rollout avant les tests :
+Suivre les TP dans l’ordre. Le TP03 déploie Namespace, ConfigMap, Deployment et Service, puis teste le Service avec :
 
 ```bash
 kubectl -n kube-training rollout status deployment/flask-app
@@ -67,20 +66,19 @@ kubectl -n kube-training get pods,svc,endpoints
 kubectl -n kube-training port-forward svc/flask-app 8080:80
 ```
 
-Tester dans un autre terminal : `curl -i http://localhost:8080/health`.
+Dans un autre terminal : `curl -i http://localhost:8080/health`.
 
-TP05 installe les CRD Gateway API et NGINX Gateway Fabric. TP06 configure MetalLB pour attribuer une adresse LoadBalancer dans le réseau du laboratoire Kind. Les étapes et les versions sont détaillées dans [le guide Gateway API et MetalLB](docs/installation-gateway-metallb.md).
+Le TP06 expose ensuite l’application via Gateway API et NGINX Gateway Fabric. Le guide formateur est dans [docs/installation-gateway.md](docs/installation-gateway.md).
 
 ## Structure
 
 ```text
 app/                         application Flask
 tests/                       tests automatisés
-kind/cluster.yaml            cluster Kind et port mapping
-manifests/                   Namespace, ConfigMap, Deployment, Service,
-                             Gateway, HTTPRoute et configuration MetalLB
+kind/cluster.yaml            cluster Kind et port mapping hôte 80 → NodePort 30080
+manifests/                   Namespace, ConfigMap, Deployment, Service, Gateway, HTTPRoute
 docs/parcours-pedagogique.md parcours formateur sur 14 h
-docs/installation-gateway-metallb.md installation et dépannage réseau
+docs/installation-gateway.md guide formateur Gateway API / NGINX Gateway Fabric
 tp/                          six énoncés apprenants
 bonus/fluxcd/                 bonus GitOps
 bonus/vault-eso/              bonus Vault + External Secrets Operator
@@ -89,13 +87,13 @@ bonus/vault-eso/              bonus Vault + External Secrets Operator
 
 ## Limites et sécurité
 
-- Kind est un environnement de laboratoire, pas un cluster de production.
+- Kind est un laboratoire, pas un cluster de production.
 - Un Secret Kubernetes standard est encodé en base64 ; ce n’est pas automatiquement du chiffrement.
 - Le token GHCR ne doit jamais être commité, inclus dans les slides ou montré dans une capture.
 - Le secret applicatif de démonstration ne doit contenir aucune donnée réelle.
 - L’application affiche seulement si `API_KEY` est configurée, jamais sa valeur.
-- MetalLB utilise une plage d’adresses adaptée au réseau Docker/Kind local ; vérifier l’absence de conflit avant le TP06.
-- Ne pas utiliser l’ancien contrôleur `ingress-nginx` : le parcours Gateway utilise NGINX Gateway Fabric et l’API Gateway API.
+- Les NetworkPolicies dépendent du CNI et ne sont pas appliquées dans ce laboratoire par défaut.
+- Le parcours utilise Gateway API et NGINX Gateway Fabric, pas l’ancien contrôleur `ingress-nginx`.
 
 ## Nettoyage
 
