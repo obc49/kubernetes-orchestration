@@ -10,8 +10,8 @@ Formation de deux jours, 7 heures effectives par jour. Fil rouge : application F
 | 2. Application et conteneur (60 min) | Application Flask, endpoints, Dockerfile, image et logs | TP01 |
 | 3. Registre et publication (60 min) | GHCR, tags, CI de publication, package privé | TP02 |
 | 4. Authentification au registre (45 min) | Token à privilèges minimaux, Secret de pull, namespace | TP03 |
-| 5. Objets Kubernetes (90 min) | Namespace, Pod, ReplicaSet, Deployment, labels/selectors, Service, ConfigMap, Secret, probes et ressources | TP04 |
-| 6. Déploiement et port-forward (60 min) | Rollout, endpoints, tests HTTP, suppression d’un Pod et réconciliation | TP04 |
+| 5. Objets Kubernetes (120 min) | Namespace, Pod, ReplicaSet, Deployment, labels/selectors, Service, ConfigMap, Secret, probes et ressources | TP04 |
+| 6. Déploiement et port-forward (70 min) | Rollout, endpoints, tests HTTP, suppression d’un Pod et réconciliation | TP04 |
 | 7. Synthèse et questions (20 min) | Récapitulatif, erreurs courantes, préparation du jour 2 | TP01–TP04 |
 
 ## Jour 2 — routage, exposition et diagnostic (7 h)
@@ -19,9 +19,9 @@ Formation de deux jours, 7 heures effectives par jour. Fil rouge : application F
 | Séquence | Contenu | TP associé |
 |---|---|---|
 | 8. Révision et diagnostic (45 min) | Pods Ready, Service/endpoints, events, logs, requests/limits et probes | TP04 |
-| 9. Gateway API (105 min) | CRD, GatewayClass, Gateway, HTTPRoute, NGINX Gateway Fabric et conditions d’état | TP05 |
-| 10. LoadBalancer local (75 min) | Service de données NGINX, NodePort, MetalLB, pool IP et chemin réseau depuis l’hôte | TP06 |
-| 11. Défi final et restitution (135 min) | Valider le routage, tester les endpoints, supprimer un Pod, diagnostiquer un incident et proposer des améliorations | TP06 |
+| 9. Gateway API (120 min) | CRD, GatewayClass, Gateway, HTTPRoute, NGINX Gateway Fabric et conditions d’état | TP05 |
+| 10. LoadBalancer local (90 min) | Service de données NGINX, NodePort, MetalLB, pool IP et chemin réseau depuis l’hôte | TP06 |
+| 11. Défi final et restitution (165 min) | Valider le routage, tester les endpoints, supprimer un Pod, diagnostiquer un incident et proposer des améliorations | TP06 |
 
 Les durées comprennent explications, démonstrations, manipulation et débrief ; ajuster la profondeur selon le groupe sans ajouter de TP.
 
