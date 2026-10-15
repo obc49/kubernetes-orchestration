@@ -80,3 +80,21 @@ bonus/                        exercices complémentaires
 ```bash
 kind delete cluster --name kube-training
 ```
+
+## TP bonus (facultatifs)
+
+Après les six TP principaux, vous pouvez poursuivre avec :
+
+- [Bonus — Déployer une application avec Flux](bonus/fluxcd/README.md)
+- [Bonus — Utiliser Vault avec External Secrets Operator](bonus/vault-eso/README.md)
+
+## Documentation officielle
+
+- [Kubernetes](https://kubernetes.io/docs/home/)
+- [kubectl — Référence rapide](https://kubernetes.io/docs/reference/kubectl/quick-reference/)
+- [Kind](https://kind.sigs.k8s.io/)
+- [Gateway API](https://gateway-api.sigs.k8s.io/)
+- [NGINX Gateway Fabric](https://docs.nginx.com/nginx-gateway-fabric/)
+- [Flux](https://fluxcd.io/flux/)
+- [External Secrets Operator](https://external-secrets.io/)
+- [HashiCorp Vault](https://developer.hashicorp.com/vault/docs)
