@@ -50,6 +50,7 @@ BusyBox est une petite image qui contient notamment un shell et des commandes Li
 ```bash
 kubectl run outil --image=busybox:1.36 -n tp02 -- sleep 3600
 kubectl get pods -n tp02
+kubectl wait --for=condition=Ready pod/outil -n tp02 --timeout=120s
 kubectl exec -it outil -n tp02 -- sh
 ```
 
@@ -102,7 +103,21 @@ kubectl get pods -n tp02 -l app=web
 
 Le sélecteur `app=web` retrouve le Pod NGINX, mais pas le Pod BusyBox.
 
-Pour voir ce qui se passe lorsqu’un selector ne correspond à aucun Pod, affichez les endpoints du Service et vérifiez les labels. Ne modifiez pas le Service existant ; expliquez simplement ce qui se passerait si son selector était incorrect.
+Modifiez temporairement le selector du Service pour qu’il ne corresponde plus au Pod :
+
+```bash
+kubectl patch svc web-svc -n tp02 -p '{"spec":{"selector":{"app":"inexistant"}}}'
+kubectl get endpoints web-svc -n tp02
+```
+
+Les endpoints sont vides : le Service ne trouve plus de Pod correspondant. Rétablissez le selector :
+
+```bash
+kubectl patch svc web-svc -n tp02 -p '{"spec":{"selector":{"app":"web"}}}'
+kubectl get endpoints web-svc -n tp02
+```
+
+Les endpoints réapparaissent. Vous venez d’observer et de corriger une panne de selector. Au TP05, vous diagnostiquerez un autre problème de Service.
 
 ## 8. Nettoyer les ressources du TP
 
