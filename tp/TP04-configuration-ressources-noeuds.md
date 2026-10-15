@@ -245,10 +245,10 @@ kubectl -n kube-training port-forward svc/flask-app 8080:80
 Dans un autre terminal :
 
 ```bash
-curl http://127.0.0.1:8080/
+curl -i http://127.0.0.1:8080/
 ```
 
-Arrêtez le `port-forward` avec `Ctrl+C`. Le message précédent doit être revenu. Si le port 8080 est déjà utilisé, choisissez un autre port local libre.
+Arrêtez le `port-forward` avec `Ctrl+C`. Le titre HTML précédent doit être revenu. Pour le vérifier, cherchez la balise `<title>` dans la réponse de `curl`.  Si le port 8080 est déjà utilisé, choisissez un autre port local libre.
 
 ## À retenir
 
