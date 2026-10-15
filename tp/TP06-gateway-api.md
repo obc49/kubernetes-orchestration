@@ -1,37 +1,48 @@
 # TP06 — Exposer l’application avec Gateway API
 
-**Objectif :** configurer et diagnostiquer une route HTTP externe avec Gateway API et NGINX Gateway Fabric, puis expliquer le chemin du trafic jusqu’aux Pods.
+## Objectif
+
+Installer le contrôleur NGINX Gateway Fabric, créer une Gateway et une HTTPRoute, puis accéder à l’application depuis votre navigateur ou avec `curl`.
 
 ## Prérequis
 
-- TP03 terminé ; Deployment et Service `flask-app` opérationnels.
+- TP03 terminé : l’application fonctionne dans `kube-training`.
 - Kind, `kubectl`, Helm 3 et accès Internet.
-- Lire le [guide formateur d’installation](../docs/installation-gateway.md).
+- Vous travaillez depuis la racine du dépôt.
 
-## Travail demandé
+## 1. Installer Gateway API et NGINX Gateway Fabric
 
-1. Installer les CRD Gateway API standard et NGINX Gateway Fabric selon le guide.
-2. Vérifier la GatewayClass `nginx`.
-3. Appliquer `manifests/40-gateway.yaml` et `manifests/50-httproute.yaml`.
-4. Vérifier les conditions de la Gateway et de l’HTTPRoute.
-5. Tester `/`, `/health` et `/ready` depuis l’hôte.
-6. Tracer le parcours : client → port mapping Kind → NodePort → proxy NGINX → Gateway/HTTPRoute → Service `flask-app` → Pods.
-7. Diagnostiquer une route non acceptée ou un backend sans endpoints à partir des événements, conditions et services.
+Suivez le [guide d’installation pour les apprenants](../docs/installation-gateway.md). Il contient les commandes complètes, les versions utilisées et les vérifications à effectuer.
 
-## Contrôles
+Vérifiez que le contrôleur fonctionne :
 
 ```bash
-kubectl get gatewayclass
 kubectl -n nginx-gateway get pods,svc
-kubectl -n kube-training get gateway,httproute
-kubectl -n kube-training describe gateway flask-gateway
-kubectl -n kube-training describe httproute flask-route
-kubectl -n kube-training get svc,endpoints
+kubectl get gatewayclass
 ```
 
-Le guide détaille le NodePort 30080 et le mapping de l’hôte sur 127.0.0.1:80. Vérifier le nom du Service de données NGINX créé par le contrôleur avant de lancer les tests ; ne pas confondre ce Service avec celui du contrôleur.
+La GatewayClass `nginx` doit être acceptée avant de continuer.
 
-## Vérifications finales
+## 2. Créer la Gateway et la route HTTP
+
+Appliquez les deux manifestes :
+
+```bash
+kubectl apply -f manifests/40-gateway.yaml
+kubectl apply -f manifests/50-httproute.yaml
+kubectl -n kube-training get gateway,httproute
+```
+
+Vérifiez les détails :
+
+```bash
+kubectl -n kube-training describe gateway flask-gateway
+kubectl -n kube-training describe httproute flask-route
+```
+
+La Gateway définit le point d’entrée HTTP. La HTTPRoute indique vers quel Service envoyer les requêtes.
+
+## 3. Tester depuis le poste
 
 ```bash
 curl -i -H 'Host: flask.local' http://127.0.0.1/
@@ -39,20 +50,47 @@ curl -i -H 'Host: flask.local' http://127.0.0.1/health
 curl -i -H 'Host: flask.local' http://127.0.0.1/ready
 ```
 
-Si l’environnement de poste ne permet pas l’accès via le port mapping, isoler les couches avec un port-forward vers le Service applicatif, puis vers le Service de données NGINX. Noter précisément à quelle couche le test échoue.
+Le test utilise le nom d’hôte `flask.local` dans l’en-tête HTTP. Il n’est pas nécessaire de modifier le fichier hosts.
 
-## Restitution finale
+## 4. Si cela ne fonctionne pas
 
-Démontrer :
-- deux Pods applicatifs Ready et un Service avec endpoints ;
-- une Gateway programmée et une HTTPRoute acceptée ;
-- des réponses HTTP attendues depuis l’hôte ;
-- un diagnostic argumenté d’un problème de routage ;
-- l’absence de secrets réels dans Git.
+Vérifiez dans cet ordre :
 
-## Débrief
+```bash
+kubectl get gatewayclass
+kubectl -n nginx-gateway get pods,svc
+kubectl -n kube-training get pods,svc,endpoints
+kubectl -n kube-training get gateway,httproute
+kubectl -n kube-training describe gateway flask-gateway
+kubectl -n kube-training describe httproute flask-route
+```
 
-- Différence entre GatewayClass, Gateway et HTTPRoute ?
-- Pourquoi le Service applicatif reste-t-il un ClusterIP ?
-- Que fournit le NodePort dans ce laboratoire, et pourquoi n’est-ce pas un LoadBalancer cloud ?
-- Quelles protections supplémentaires faudrait-il prévoir en production ?
+- Le contrôleur doit être opérationnel.
+- Le Service `flask-app` doit avoir des endpoints.
+- La Gateway et la HTTPRoute doivent avoir des conditions favorables.
+- Le Service de données NGINX doit exposer le NodePort `30080`.
+- Le port mapping de Kind doit relier le port 80 du poste au port 30080 du nœud.
+
+Si le test externe échoue, vérifiez d’abord l’application seule :
+
+```bash
+kubectl -n kube-training port-forward svc/flask-app 8080:80
+curl -i http://localhost:8080/health
+```
+
+Arrêtez le `port-forward` avec `Ctrl+C`. Cette vérification permet de distinguer un problème applicatif d’un problème de routage.
+
+## À retenir
+
+- GatewayClass identifie l’implémentation du contrôleur.
+- Gateway définit le point d’entrée et son listener.
+- HTTPRoute décrit les règles de routage vers un Service.
+- Le Service applicatif reste un Service ClusterIP.
+- Le montage Kind + NodePort sert au laboratoire ; il ne remplace pas un LoadBalancer de production.
+
+## Questions
+
+1. Quel est le rôle de GatewayClass, Gateway et HTTPRoute ?
+2. Où se situe le Service `flask-app` dans le trajet du trafic ?
+3. Comment distinguer une panne applicative d’une panne de routage ?
+4. Pourquoi ce montage n’est-il pas une exposition de production ?
