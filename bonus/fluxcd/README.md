@@ -208,7 +208,7 @@ Flux peut prendre une minute pour détecter le changement :
 ```bash
 flux get sources git -A
 flux get kustomizations -A
-kubectl get deployment, pods,svc
+kubectl get deployment,pods,svc
 kubectl rollout status deployment/demo
 ```
 
