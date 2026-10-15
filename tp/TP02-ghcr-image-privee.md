@@ -11,10 +11,10 @@
 ## Partie A — image et registre
 
 1. Ouvrir l’onglet Actions et repérer le workflow de publication GHCR.
-2. Identifier le package `ghcr.io/oboyo-training/kubernetes-orchestration` et vérifier sa visibilité.
-3. Relever le tag SHA disponible et celui communiqué par le formateur.
+2. Identifier le package `ghcr.io/<votre-espace>/kubernetes-orchestration` et vérifier sa visibilité.
+3. Relever le tag SHA disponible.
 4. Expliquer pourquoi un tag SHA est plus reproductible que `latest`.
-5. Si le formateur l’autorise, construire et publier une image depuis un poste autorisé.
+5. construire et publier une image depuis un poste autorisé.
 
 La visibilité privée doit être vérifiée dans GitHub Packages ; le workflow ne la définit pas automatiquement.
 

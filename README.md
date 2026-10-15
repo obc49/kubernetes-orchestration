@@ -1,6 +1,6 @@
-# Kubernetes Orchestration — projet fil rouge
+# Kubernetes Orchestration
 
-Projet pédagogique pour la formation **Kubernetes – Orchestration des conteneurs** (14 heures, deux jours). Le dépôt conserve exactement **six TP apprenants, TP01 à TP06**.
+Projet fil rouge pour la formation **Kubernetes – Orchestration des conteneurs**. Le dépôt conserve exactement **six TP apprenants, TP01 à TP06**.
 
 ## Parcours des six TP
 
@@ -13,17 +13,14 @@ Projet pédagogique pour la formation **Kubernetes – Orchestration des contene
 | [TP05](tp/TP05-administration-diagnostic-securite.md) | Administration, diagnostic et sécurité | Incident diagnostiqué avec kubectl et contrôles de sécurité expliqués |
 | [TP06](tp/TP06-gateway-api.md) | Gateway API et NGINX Gateway Fabric | Route HTTP fonctionnelle depuis l’hôte |
 
-FluxCD et Vault + External Secrets Operator restent des **bonus hors socle**. MetalLB n’est pas utilisé dans le parcours.
 
 ## Prérequis et outillage
 
-- Bases Linux, TCP/IP, virtualisation et conteneurs.
 - Git, Docker Engine (Docker Desktop sous Windows/macOS ou Docker Engine sous Linux), `kubectl`, Kind, Helm 3 et `curl`.
 - Bash recommandé. Sous Windows, utiliser Ubuntu/WSL2 avec un moteur Docker fonctionnel.
 - Python 3.11+ uniquement pour tester l’application hors conteneur.
 - Accès Internet pour récupérer les images et les charts.
 
-Kind est l’environnement pratique commun. Minikube et kubeadm sont présentés comme options d’installation, sans demander aux participants d’installer plusieurs clusters.
 
 ## Tester l’application et construire l’image
 
@@ -49,7 +46,7 @@ docker rm -f kube-training-test
 
 Le workflow [publish-ghcr.yml](.github/workflows/publish-ghcr.yml) publie l’image lors d’un push sur `main`, avec un tag SHA et `latest`. La visibilité privée du package doit être vérifiée dans GitHub Packages ; le workflow ne définit pas cette visibilité à lui seul.
 
-Pour le cours, utiliser le tag d’image validé par le formateur. Créer le Secret `ghcr-pull` dans le namespace `kube-training` avant de déployer le Deployment. Ne jamais versionner de token.
+Pour le cours, utiliser le tag d’image SHA. Créer le Secret `ghcr-pull` dans le namespace `kube-training` avant de déployer le Deployment. Ne jamais versionner de token.
 
 ## Déploiement local
 
@@ -68,7 +65,7 @@ kubectl -n kube-training port-forward svc/flask-app 8080:80
 
 Dans un autre terminal : `curl -i http://localhost:8080/health`.
 
-Le TP06 expose ensuite l’application via Gateway API et NGINX Gateway Fabric. Le guide formateur est dans [docs/installation-gateway.md](docs/installation-gateway.md).
+Le TP06 expose ensuite l’application via Gateway API et NGINX Gateway Fabric. Le guide est dans [docs/installation-gateway.md](docs/installation-gateway.md).
 
 ## Structure
 
@@ -77,8 +74,6 @@ app/                         application Flask
 tests/                       tests automatisés
 kind/cluster.yaml            cluster Kind et port mapping hôte 80 → NodePort 30080
 manifests/                   Namespace, ConfigMap, Deployment, Service, Gateway, HTTPRoute
-docs/parcours-pedagogique.md parcours formateur sur 14 h
-docs/installation-gateway.md guide formateur Gateway API / NGINX Gateway Fabric
 tp/                          six énoncés apprenants
 bonus/fluxcd/                 bonus GitOps
 bonus/vault-eso/              bonus Vault + External Secrets Operator
@@ -87,12 +82,12 @@ bonus/vault-eso/              bonus Vault + External Secrets Operator
 
 ## Limites et sécurité
 
-- Kind est un laboratoire, pas un cluster de production.
+- Kind est un lab, pas un cluster de production.
 - Un Secret Kubernetes standard est encodé en base64 ; ce n’est pas automatiquement du chiffrement.
 - Le token GHCR ne doit jamais être commité, inclus dans les slides ou montré dans une capture.
 - Le secret applicatif de démonstration ne doit contenir aucune donnée réelle.
 - L’application affiche seulement si `API_KEY` est configurée, jamais sa valeur.
-- Les NetworkPolicies dépendent du CNI et ne sont pas appliquées dans ce laboratoire par défaut.
+- Les NetworkPolicies dépendent du CNI et ne sont pas appliquées dans ce lab par défaut.
 - Le parcours utilise Gateway API et NGINX Gateway Fabric, pas l’ancien contrôleur `ingress-nginx`.
 
 ## Nettoyage

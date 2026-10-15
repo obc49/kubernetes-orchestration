@@ -37,6 +37,5 @@ Si le port 5000 est déjà utilisé, remplacez le port hôte par `5001:5000` et 
 ## Débrief
 
 - Différence entre image, conteneur et processus ?
-- Pourquoi l’application écoute-t-elle sur `0.0.0.0` ?
 - Pourquoi la configuration et les secrets ne doivent-ils pas être intégrés à l’image ?
 - Quelle différence entre les endpoints `/health` et `/ready` ?
