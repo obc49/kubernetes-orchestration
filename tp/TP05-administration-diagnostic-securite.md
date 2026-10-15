@@ -137,3 +137,8 @@ Pour diagnostiquer, vérifiez l’état, les événements, la description de la 
 3. À quoi servent Role et RoleBinding ?
 4. Pourquoi la commande `kubectl auth can-i` est-elle utile ?
 5. Pourquoi faut-il tester l’effet d’une NetworkPolicy sur un CNI qui la prend en charge ?
+
+
+---
+
+**Suite :** [TP06 — Exposer l’application avec Gateway API](TP06-gateway-api.md)
