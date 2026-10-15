@@ -158,3 +158,8 @@ Arrêtez le suivi avec `Ctrl+C`. Le Deployment maintient le nombre de réplicas 
 3. Pourquoi le Secret doit-il être dans `kube-training` ?
 4. Quelle différence entre Deployment, ReplicaSet et Pod ?
 5. Pourquoi le Service continue-t-il à fonctionner après la recréation d’un Pod ?
+
+
+---
+
+**Suite :** [TP04 — Configurer l’application et comprendre ses ressources](TP04-configuration-ressources-noeuds.md)
