@@ -94,3 +94,15 @@ Arrêtez le `port-forward` avec `Ctrl+C`. Cette vérification permet de distingu
 2. Où se situe le Service `flask-app` dans le trajet du trafic ?
 3. Comment distinguer une panne applicative d’une panne de routage ?
 4. Pourquoi ce montage n’est-il pas une exposition de production ?
+
+
+---
+
+## Pour aller plus loin — TP bonus
+
+Les TP bonus sont facultatifs. Faites-les après les six TP principaux.
+
+- [Bonus — Déployer une application avec Flux](../bonus/fluxcd/README.md)
+- [Bonus — Utiliser Vault avec External Secrets Operator](../bonus/vault-eso/README.md)
+
+**Retour au dépôt :** [README principal](../README.md)
