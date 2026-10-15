@@ -38,19 +38,39 @@ Vérifiez les détails :
 ```bash
 kubectl -n kube-training describe gateway flask-gateway
 kubectl -n kube-training describe httproute flask-route
+kubectl -n kube-training get svc flask-gateway-nginx
+kubectl -n kube-training wait --for=condition=Programmed gateway/flask-gateway --timeout=120s
 ```
 
-La Gateway définit le point d’entrée HTTP. La HTTPRoute indique vers quel Service envoyer les requêtes.
+La Gateway définit le point d’entrée HTTP. La HTTPRoute indique vers quel Service envoyer les requêtes. Le contrôleur crée le Service de données `flask-gateway-nginx` dans le namespace `kube-training` lorsque la Gateway est prise en charge.
 
 ## 3. Tester depuis le poste
 
+Ouvrez deux terminaux.
+
+**Terminal 1 :** lancez le `port-forward` vers le Service de données NGINX et laissez-le actif.
+
 ```bash
-curl -i -H 'Host: flask.local' http://127.0.0.1/
-curl -i -H 'Host: flask.local' http://127.0.0.1/health
-curl -i -H 'Host: flask.local' http://127.0.0.1/ready
+kubectl -n kube-training port-forward svc/flask-gateway-nginx 8080:80
 ```
 
-Le test utilise le nom d’hôte `flask.local` dans l’en-tête HTTP. Il n’est pas nécessaire de modifier le fichier hosts.
+Si le port 8080 est déjà utilisé sur votre poste, remplacez-le par 8081 ou un autre port libre. Seul le port local change.
+
+**Terminal 2 :** testez les trois endpoints :
+
+```bash
+curl -i -H 'Host: flask.local' http://127.0.0.1:8080/
+curl -i -H 'Host: flask.local' http://127.0.0.1:8080/health
+curl -i -H 'Host: flask.local' http://127.0.0.1:8080/ready
+```
+
+La HTTPRoute ne répond que pour le nom d’hôte `flask.local`. Vérifiez le cas négatif :
+
+```bash
+curl -i http://127.0.0.1:8080/
+```
+
+Sans l’en-tête `Host: flask.local`, la requête ne correspond pas à la route et doit retourner `404`. Il n’est pas nécessaire de modifier le fichier hosts.
 
 ## 4. Si cela ne fonctionne pas
 
@@ -60,6 +80,7 @@ Vérifiez dans cet ordre :
 kubectl get gatewayclass
 kubectl -n nginx-gateway get pods,svc
 kubectl -n kube-training get pods,svc,endpoints
+kubectl -n kube-training get svc flask-gateway-nginx
 kubectl -n kube-training get gateway,httproute
 kubectl -n kube-training describe gateway flask-gateway
 kubectl -n kube-training describe httproute flask-route
@@ -68,8 +89,8 @@ kubectl -n kube-training describe httproute flask-route
 - Le contrôleur doit être opérationnel.
 - Le Service `flask-app` doit avoir des endpoints.
 - La Gateway et la HTTPRoute doivent avoir des conditions favorables.
-- Le Service de données NGINX doit exposer le NodePort `30080`.
-- Le port mapping de Kind doit relier le port 80 du poste au port 30080 du nœud.
+- Le Service `flask-gateway-nginx` doit exister dans le namespace `kube-training`.
+- Le `port-forward` doit être actif dans le premier terminal.
 
 Si le test externe échoue, vérifiez d’abord l’application seule :
 
