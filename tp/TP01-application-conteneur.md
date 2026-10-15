@@ -118,3 +118,8 @@ Ne supprimez pas l’image publiée : elle sera utilisée dans les TP suivants.
 2. À quoi servent `/health` et `/ready` ?
 3. Quelle est l’adresse complète de l’image que vous venez de publier ?
 4. Pourquoi ne faut-il jamais mettre le token dans le Dockerfile ou dans Git ?
+
+
+---
+
+**Suite :** [TP02 — Premiers pas dans Kubernetes](TP02-premiers-pas-kubernetes.md)
