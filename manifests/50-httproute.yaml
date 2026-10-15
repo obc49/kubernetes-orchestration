@@ -4,6 +4,8 @@ metadata:
   name: flask-route
   namespace: kube-training
 spec:
+  hostnames:
+    - flask.local
   parentRefs:
     - name: flask-gateway
       sectionName: http
