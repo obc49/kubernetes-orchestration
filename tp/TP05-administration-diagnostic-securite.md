@@ -1,61 +1,139 @@
-# TP05 — Administration, diagnostic et sécurité
+# TP05 — Diagnostiquer une panne et vérifier les accès
 
-**Objectif :** diagnostiquer un incident à partir de l’état désiré, des événements, des logs et des ressources ; connaître les contrôles de sécurité essentiels d’un cluster.
+## Objectif
+
+Utiliser les commandes de base pour trouver la cause d’un problème, corriger la configuration, puis vérifier les droits d’accès d’un compte de service.
 
 ## Prérequis
 
-- TP03 et TP04 terminés.
-- Cluster Kind disponible et application déployée.
+- TP03 terminé ; l’application fonctionne dans `kube-training`.
+- TP04 terminé.
+- Le cluster Kind est démarré.
 
-## Partie A — diagnostic guidé
+## Partie A — Diagnostiquer un problème de Service
 
-Le formateur fournit ou provoque un incident contrôlé (par exemple un sélecteur erroné dans une copie de Service, une image inexistante dans un Deployment de test, ou une contrainte de placement impossible). Ne pas casser durablement le Deployment fil rouge.
-
-Suivre une démarche structurée :
-
-1. Observer l’état global et les nœuds.
-2. Identifier le Pod ou l’objet en anomalie.
-3. Lire les événements et la description de l’objet.
-4. Lire les logs et, si nécessaire, exécuter une commande dans un conteneur.
-5. Vérifier Service, labels/selectors et endpoints.
-6. Formuler une hypothèse, tester une correction et vérifier le retour à l’état attendu.
+1. Vérifiez l’état de l’application :
 
 ```bash
-kubectl get nodes
-kubectl -n kube-training get deploy,rs,pods,svc,endpoints
-kubectl -n kube-training get events --sort-by=.lastTimestamp
-kubectl -n kube-training describe pod <nom-du-pod>
-kubectl -n kube-training logs deployment/flask-app --all-pods=true
-kubectl -n kube-training exec deployment/flask-app -- printenv APP_ENV
+kubectl -n kube-training get deployment,pods,svc,endpoints
+```
+
+2. Ouvrez `manifests/30-service.yaml`. Dans une copie nommée `/tmp/service-tp05.yaml`, remplacez temporairement le selector `app.kubernetes.io/name: flask-app` par `app.kubernetes.io/name: mauvaise-valeur`.
+
+3. Appliquez la copie de test :
+
+```bash
+kubectl apply -f /tmp/service-tp05.yaml
+kubectl -n kube-training get svc,endpoints
+```
+
+Le Service n’a plus d’endpoints car son selector ne correspond à aucun Pod. Retrouvez les labels des Pods et le selector du Service :
+
+```bash
+kubectl -n kube-training get pods --show-labels
+kubectl -n kube-training describe svc flask-app
+```
+
+4. Restaurez le Service depuis le manifeste d’origine :
+
+```bash
+kubectl apply -f manifests/30-service.yaml
 kubectl -n kube-training get endpoints flask-app
 ```
 
-Pour comparer les logs du conteneur précédent après un redémarrage, utiliser `kubectl logs <pod> --previous` si un conteneur précédent existe.
+Les endpoints doivent réapparaître.
 
-## Partie B — administration et supervision
+## Partie B — Utiliser les outils de diagnostic
 
-Expliquer le rôle de `kubectl`, API Server, etcd, kubelet et du control plane. Distinguer les logs applicatifs, les événements Kubernetes, les métriques et les alertes. Présenter conceptuellement Node Problem Detector pour la détection de problèmes de nœud et StackDriver (désormais associé à Google Cloud Operations) comme exemple de supervision cloud ; leur installation complète n’est pas requise dans ce laboratoire.
+Exécutez les commandes et identifiez ce que chacune apporte :
 
-## Partie C — sécurité
+```bash
+kubectl -n kube-training get pods
+kubectl -n kube-training describe pod <nom-du-pod>
+kubectl -n kube-training logs <nom-du-pod>
+kubectl -n kube-training get events --sort-by=.lastTimestamp
+kubectl -n kube-training exec deployment/flask-app -- printenv APP_ENV
+```
 
-Pour chaque point, donner un risque et une mesure de réduction :
+Remplacez `<nom-du-pod>` par un nom de Pod existant. Si un conteneur a redémarré, `kubectl logs <nom-du-pod> --previous` permet de consulter les logs du conteneur précédent.
 
-- **API et RBAC :** authentification, autorisation, moindre privilège, comptes de service et séparation des namespaces.
-- **Secrets :** éviter Git et les logs ; limiter les accès ; comprendre que base64 n’est pas du chiffrement.
-- **Ressources :** requests/limits, quotas et limites de namespace comme moyens de réduire les abus de ressources.
-- **Réseau :** rôle des NetworkPolicies et fait que leur effet dépend du CNI.
-- **etcd :** accès réseau restreint, authentification/chiffrement adaptés et protection des sauvegardes.
-- **Nœuds :** correctifs, accès d’administration limité et surveillance de l’état des nœuds.
+## Partie C — Vérifier les droits avec RBAC
 
-Dans Kind, identifier ce qui est réellement configuré et ce qui reste une recommandation ou une démonstration conceptuelle. Ne pas prétendre qu’une NetworkPolicy est appliquée si le CNI ne la prend pas en charge.
+RBAC permet de définir ce qu’un compte a le droit de faire dans Kubernetes. Nous allons autoriser un compte de service à lire les ConfigMaps du namespace `kube-training`.
 
-## Restitution
+Créez les ressources :
 
-Présenter l’incident, les indices observés, la cause probable, la correction, puis deux mesures de prévention. Indiquer explicitement les limites du laboratoire par rapport à un cluster de production.
+```bash
+kubectl -n kube-training create serviceaccount lecteur-config
+```
 
-## Débrief
+Créez le fichier `/tmp/role-tp05.yaml` :
 
-- Quelle différence entre `describe`, `logs` et `exec` ?
-- Pourquoi un Pod Running peut-il ne pas recevoir de trafic ?
-- Quelle différence entre authentification et autorisation RBAC ?
-- Pourquoi faut-il protéger etcd et ses sauvegardes ?
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: lecture-configmaps
+  namespace: kube-training
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: lecteur-config-binding
+  namespace: kube-training
+subjects:
+  - kind: ServiceAccount
+    name: lecteur-config
+    namespace: kube-training
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: lecture-configmaps
+```
+
+Appliquez le fichier et vérifiez les droits :
+
+```bash
+kubectl apply -f /tmp/role-tp05.yaml
+kubectl auth can-i get configmaps -n kube-training --as=system:serviceaccount:kube-training:lecteur-config
+kubectl auth can-i delete pods -n kube-training --as=system:serviceaccount:kube-training:lecteur-config
+```
+
+Résultat attendu : la première commande répond `yes`, la seconde `no`. Le compte ne reçoit que les droits définis dans le Role.
+
+## Partie D — Comprendre les limites de la sécurité réseau
+
+Une NetworkPolicy peut limiter les flux entre Pods, mais son effet dépend du plugin réseau (CNI) qui équipe le cluster. Dans ce laboratoire, ne concluez pas qu’un flux est bloqué simplement parce qu’un manifeste NetworkPolicy est accepté par l’API.
+
+Répondez à ces questions :
+- Quel risque réduit une NetworkPolicy ?
+- Pourquoi faut-il vérifier que le CNI applique les règles ?
+- Pourquoi un Secret Kubernetes ne doit-il pas être commité dans Git ?
+- Pourquoi faut-il limiter les droits RBAC au strict nécessaire ?
+
+## Nettoyage
+
+Supprimez les ressources RBAC créées pour ce TP :
+
+```bash
+kubectl -n kube-training delete rolebinding lecteur-config-binding
+kubectl -n kube-training delete role lecture-configmaps
+kubectl -n kube-training delete serviceaccount lecteur-config
+rm -f /tmp/role-tp05.yaml /tmp/service-tp05.yaml
+```
+
+## À retenir
+
+Pour diagnostiquer, vérifiez l’état, les événements, la description de la ressource et les logs. Formulez une hypothèse, corrigez un seul élément, puis vérifiez le résultat.
+
+## Questions
+
+1. Pourquoi un Pod peut-il être Ready alors que le Service n’a aucun endpoint ?
+2. Quelle différence entre `get`, `describe`, `logs` et `exec` ?
+3. À quoi servent Role et RoleBinding ?
+4. Pourquoi la commande `kubectl auth can-i` est-elle utile ?
+5. Pourquoi faut-il tester l’effet d’une NetworkPolicy sur un CNI qui la prend en charge ?
