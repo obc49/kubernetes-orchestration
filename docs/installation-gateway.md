@@ -23,7 +23,7 @@ kubectl get nodes -o wide
 Nous utilisons NGINX Gateway Fabric 2.7.2 pour ce laboratoire. Installez les CRD Gateway API standard correspondant à cette version :
 
 ```bash
-kubectl apply -f "https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.7.2"
+kubectl kustomize "https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.7.2" | kubectl apply -f -
 ```
 
 ## 3. Installer NGINX Gateway Fabric avec Helm
@@ -46,7 +46,7 @@ kubectl get gatewayclass
 kubectl describe gatewayclass nginx
 ```
 
-Les Pods du contrôleur doivent être opérationnels et la GatewayClass `nginx` doit être acceptée. Repérez le Service de données NGINX et vérifiez qu’il expose le NodePort `30080`.
+Les Pods du contrôleur doivent être `Running` et la GatewayClass `nginx` doit être acceptée. Le Service de données NGINX sera créé plus tard, lorsque vous appliquerez la Gateway au TP06.
 
 ## 4. Vérifier l’application
 
@@ -59,31 +59,30 @@ kubectl -n kube-training rollout status deployment/flask-app
 
 Si les Pods ne sont pas prêts, revenez au TP03 et corrigez le problème avant de continuer.
 
-## 5. Vérifier le mapping des ports
+## 5. Comprendre le chemin du trafic
 
 Le chemin réseau de ce TP est :
 
 ```text
-Votre poste : 127.0.0.1:80
+Votre poste : 127.0.0.1:8080
         |
         v
-Port mapping Kind : port 80 du poste -> port 30080 du nœud
+kubectl port-forward vers le Service de données NGINX
         |
         v
-Service de données NGINX : NodePort 30080
+Service flask-gateway-nginx (namespace kube-training)
         |
         v
 Gateway -> HTTPRoute -> Service flask-app:80 -> Pods Flask:5000
 ```
 
-Le nom du Service de données dépend de la configuration du contrôleur. Pour l’identifier :
+Le Service de données est créé dans le namespace de la Gateway, ici `kube-training`, lorsque la Gateway est attachée à la GatewayClass. Son nom est `flask-gateway-nginx`. Le Service est de type NodePort, qui serait un point d’entrée sur un vrai cluster. Dans ce laboratoire, utilisez `port-forward` pour ne dépendre d’aucun port fixe de votre poste.
+
+Après avoir créé la Gateway au TP06, vérifiez-le avec :
 
 ```bash
-kubectl -n nginx-gateway get svc
-kubectl -n kube-training get svc
+kubectl -n kube-training get svc flask-gateway-nginx
 ```
-
-Ne confondez pas le Service du contrôleur avec le Service de données qui reçoit le trafic de la Gateway.
 
 ## 6. Si l’installation ne fonctionne pas
 
@@ -93,10 +92,11 @@ Vérifiez les éléments dans cet ordre :
 helm list -n nginx-gateway
 kubectl -n nginx-gateway get pods,svc
 kubectl get gatewayclass
-kubectl -n nginx-gateway logs deployment/ngf
+kubectl -n nginx-gateway get deployments
+kubectl -n nginx-gateway logs deployment/<nom-affiché>
 ```
 
-Si le nom du Deployment diffère, récupérez son nom avec `kubectl -n nginx-gateway get deployments`, puis relancez la commande `logs`.
+Remplacez `<nom-affiché>` par le nom retourné par la première commande.
 
 Si le NodePort 30080 n’apparaît pas, vérifiez les valeurs du chart installé et la documentation de la version 2.7.2 avant de poursuivre.
 
