@@ -90,11 +90,11 @@ Installez ESO avec son dépôt Helm officiel :
 ```bash
 helm repo add external-secrets https://charts.external-secrets.io
 helm repo update
-helm show values external-secrets/external-secrets | grep -E "installCRDs|crds:" -A 3
+helm show values external-secrets/external-secrets --version 0.20.1 | grep -n -A 3 "crds:"
 helm install external-secrets external-secrets/external-secrets \
   --version 0.20.1 \
   --namespace external-secrets --create-namespace \
-  --set installCRDs=true \
+  --set crds.create=true \
   --wait --timeout 5m
 ```
 
