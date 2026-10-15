@@ -15,11 +15,10 @@ spec:
       labels:
         app.kubernetes.io/name: flask-app
     spec:
-      imagePullSecrets:
-        - name: ghcr-pull
       containers:
         - name: flask-app
-          image: ghcr.io/oboyo-training/kubernetes-orchestration:sha-aec4ca1
+          # Au TP03, remplacez cette image par celle publiée au TP01.
+          image: ghcr.io/oboyo-training/kubernetes-orchestration:remplacer-au-tp01
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
