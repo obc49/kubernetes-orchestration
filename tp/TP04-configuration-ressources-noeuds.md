@@ -192,3 +192,8 @@ Le nouveau Pod possède un nouveau volume `emptyDir` : l’ancien fichier n’es
 3. Pourquoi le Pod reste-t-il Pending quand aucun nœud ne porte le label demandé ?
 4. À quel moment les données d’un `emptyDir` sont-elles perdues ?
 5. Quelle différence entre `emptyDir` et un stockage persistant demandé via PVC ?
+
+
+---
+
+**Suite :** [TP05 — Diagnostiquer une panne et vérifier les accès](TP05-administration-diagnostic-securite.md)
