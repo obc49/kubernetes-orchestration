@@ -70,7 +70,7 @@ En mode développement, Vault est initialisé automatiquement. La configuration 
 Toujours dans le shell du Pod Vault, activez un moteur KV version 2 et ajoutez une valeur fictive :
 
 ```bash
-vault secrets enable -path=secret kv-v2
+vault secrets list
 vault kv put secret/kubernetes-demo API_KEY="demo-key-not-a-real-secret"
 vault kv get secret/kubernetes-demo
 ```
@@ -90,7 +90,9 @@ Installez ESO avec son dépôt Helm officiel :
 ```bash
 helm repo add external-secrets https://charts.external-secrets.io
 helm repo update
+helm show values external-secrets/external-secrets | grep -E "installCRDs|crds:" -A 3
 helm install external-secrets external-secrets/external-secrets \
+  --version 0.20.1 \
   --namespace external-secrets --create-namespace \
   --set installCRDs=true \
   --wait --timeout 5m
@@ -210,7 +212,7 @@ kubectl -n external-secrets logs deployment/external-secrets
 Pour éviter de modifier le Deployment principal, créez une copie de test dans `/tmp/flask-api-key-test.yaml` à partir de `manifests/20-deployment.yaml`. Dans cette copie :
 
 - changez le nom du Deployment en `flask-app-eso-test` ;
-- changez le selector et le label de Pod en `app: flask-app-eso-test` ;
+- changez le selector et le label de Pod en `app.kubernetes.io/name: flask-app-eso-test` ;
 - conservez la même image et la configuration non sensible ;
 - ajoutez cette variable dans le conteneur :
 
@@ -231,7 +233,7 @@ Appliquez la copie, puis vérifiez le démarrage :
 ```bash
 kubectl apply -f /tmp/flask-api-key-test.yaml
 kubectl -n kube-training rollout status deployment/flask-app-eso-test
-kubectl -n kube-training get pods -l app=flask-app-eso-test
+kubectl -n kube-training get pods -l app.kubernetes.io/name=flask-app-eso-test
 ```
 
 L’application ne doit jamais afficher la valeur de la clé. Le but est de vérifier que le Secret existe et peut être référencé par un Pod, pas d’afficher son contenu.
