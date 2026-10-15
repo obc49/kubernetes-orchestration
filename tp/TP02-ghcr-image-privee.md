@@ -1,65 +1,129 @@
-# TP02 — Image privée GHCR et authentification Kubernetes
+# TP02 — Premiers pas dans Kubernetes
 
-**Objectif :** identifier une version d’image reproductible et autoriser Kubernetes à la télécharger depuis un registre privé, sans intégrer de credentials dans l’image ou dans Git.
+## Objectif
 
-## Prérequis
+Créer un namespace, lancer un Pod avec une image publique, l’identifier avec des labels, puis y accéder à travers un Service et `port-forward`. Dans ce TP, nous créons les objets un par un : pas encore de Deployment.
 
-- Docker, `kubectl` et accès au dépôt/package GitHub.
-- Identifiant GitHub et token autorisé à lire le package (`read:packages`).
-- Ne jamais utiliser un token de production ni commiter les valeurs.
+## 1. Vérifier le cluster
 
-## Partie A — image et registre
-
-1. Ouvrir l’onglet Actions et repérer le workflow de publication GHCR.
-2. Identifier le package `ghcr.io/<votre-espace>/kubernetes-orchestration` et vérifier sa visibilité.
-3. Relever le tag SHA disponible.
-4. Expliquer pourquoi un tag SHA est plus reproductible que `latest`.
-5. construire et publier une image depuis un poste autorisé.
-
-La visibilité privée doit être vérifiée dans GitHub Packages ; le workflow ne la définit pas automatiquement.
-
-## Partie B — Secret de pull
-
-Créer le namespace puis le Secret `ghcr-pull`. Saisir le token de façon masquée :
+Si le cluster n’existe pas, créez-le depuis la racine du dépôt :
 
 ```bash
-kubectl apply -f manifests/00-namespace.yaml
-
-read -p "Identifiant GitHub : " GHCR_USER
-read -s -p "Token avec read:packages : " GHCR_TOKEN
-echo
-
-kubectl -n kube-training create secret docker-registry ghcr-pull \
-  --docker-server=ghcr.io \
-  --docker-username="$GHCR_USER" \
-  --docker-password="$GHCR_TOKEN" \
-  --docker-email="training@example.invalid" \
-  --dry-run=client -o yaml | kubectl apply -f -
-
-unset GHCR_TOKEN
-unset GHCR_USER
-
-kubectl -n kube-training get secret ghcr-pull
-kubectl -n kube-training describe secret ghcr-pull
+kind create cluster --config kind/cluster.yaml --wait 120s
+kubectl get nodes
+kubectl cluster-info
 ```
 
-Ne pas exécuter `kubectl get secret ghcr-pull -o yaml` pendant la séance. Vérifier dans le Deployment le champ `imagePullSecrets` et expliquer pourquoi le Secret doit être dans le même namespace que le Pod.
+Les trois nœuds doivent être `Ready`.
 
-## Vérifications
+## 2. Créer un namespace
 
-- Package disponible avec un tag précis.
-- Secret `ghcr-pull` présent dans `kube-training`, sans afficher sa valeur.
-- Aucun token ou fichier de credentials dans Git.
-- Le tag configuré dans `manifests/20-deployment.yaml` correspond à une image réellement disponible.
+Un namespace permet de regrouper des ressources Kubernetes.
 
-## En cas d’échec
+```bash
+kubectl create namespace tp02
+kubectl get namespaces
+kubectl get pods -n tp02
+```
 
-- `ImagePullBackOff` : vérifier le nom du tag, la visibilité du package, les permissions du token et le Secret dans le bon namespace.
-- Ne pas basculer vers un package public ou une image locale sans l’accord du formateur ; cela masquerait le problème d’authentification.
+## 3. Créer un Pod NGINX
 
-## Débrief
+Créez le Pod directement avec kubectl :
 
-- À quoi sert un registre d’images ?
-- Quelle différence entre tag mutable et tag SHA ?
-- Quelle différence entre `read:packages` et `write:packages` ?
-- Pourquoi ne faut-il jamais publier un token dans Git ou dans les logs ?
+```bash
+kubectl run web --image=nginx:stable --labels="app=web" -n tp02
+kubectl get pods -n tp02 -o wide
+kubectl describe pod web -n tp02
+kubectl get pod web -n tp02 --show-labels
+```
+
+Attendez que le Pod soit `Running` :
+
+```bash
+kubectl wait --for=condition=Ready pod/web -n tp02 --timeout=120s
+```
+
+## 4. Ajouter un second Pod avec BusyBox
+
+BusyBox est une petite image qui contient notamment un shell et des commandes Linux.
+
+```bash
+kubectl run outil --image=busybox:1.36 -n tp02 -- sleep 3600
+kubectl get pods -n tp02
+kubectl exec -it outil -n tp02 -- sh
+```
+
+Dans le shell BusyBox, exécutez `ls`, puis tapez `exit` pour en sortir.
+
+## 5. Créer un Service pour NGINX
+
+Un Service fournit un point d’accès stable vers les Pods qui correspondent à son selector. Créez le Service avec cette commande :
+
+```bash
+kubectl expose pod web --name=web-svc --port=80 --target-port=80 -n tp02
+kubectl get svc -n tp02
+kubectl describe svc web-svc -n tp02
+kubectl get endpoints web-svc -n tp02
+```
+
+Comparez le selector du Service avec le label du Pod :
+
+```bash
+kubectl get pod web -n tp02 --show-labels
+kubectl get svc web-svc -n tp02 -o yaml
+```
+
+Les labels doivent correspondre pour que le Service trouve le Pod.
+
+## 6. Accéder au Service depuis votre poste
+
+Dans un terminal, lancez :
+
+```bash
+kubectl port-forward -n tp02 svc/web-svc 8080:80
+```
+
+Laissez ce terminal ouvert. Dans un second terminal :
+
+```bash
+curl -I http://localhost:8080
+```
+
+Vous devez recevoir une réponse HTTP de NGINX. Arrêtez le `port-forward` avec `Ctrl+C`.
+
+## 7. Observer les labels et les selectors
+
+Affichez les Pods avec leur label :
+
+```bash
+kubectl get pods -n tp02 --show-labels
+kubectl get pods -n tp02 -l app=web
+```
+
+Le sélecteur `app=web` retrouve le Pod NGINX, mais pas le Pod BusyBox.
+
+Pour voir ce qui se passe lorsqu’un selector ne correspond à aucun Pod, affichez les endpoints du Service et vérifiez les labels. Ne modifiez pas le Service existant ; expliquez simplement ce qui se passerait si son selector était incorrect.
+
+## 8. Nettoyer les ressources du TP
+
+```bash
+kubectl delete namespace tp02
+```
+
+La suppression du namespace supprime les ressources qu’il contient.
+
+## À retenir
+
+- Un Pod exécute un ou plusieurs conteneurs.
+- Un namespace regroupe des ressources.
+- Les labels identifient des ressources ; les selectors permettent de les retrouver.
+- Un Service sélectionne les Pods par leurs labels.
+- `port-forward` ouvre un accès temporaire depuis votre poste ; ce n’est pas une exposition de production.
+
+## Questions
+
+1. Quelle différence entre un Pod et un conteneur ?
+2. À quoi sert le namespace `tp02` ?
+3. Comment le Service `web-svc` trouve-t-il le Pod NGINX ?
+4. Que se passe-t-il si aucun Pod ne correspond au selector du Service ?
+5. Pourquoi utilise-t-on `port-forward` dans ce TP ?
