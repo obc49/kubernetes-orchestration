@@ -7,7 +7,7 @@ Ce dépôt contient l’application fil rouge, les manifestes et les six TP de l
 | TP | Sujet | À la fin du TP |
 |---|---|---|
 | [TP01](tp/TP01-application-conteneur.md) | Application, Docker et GHCR | Vous avez construit et publié l’image de l’application. |
-| [TP02](tp/TP02-ghcr-image-privee.md) | Premiers pas dans Kubernetes | Vous savez créer un Pod, un namespace et un Service, puis tester avec `port-forward`. |
+| [TP02](tp/TP02-premiers-pas-kubernetes.md) | Premiers pas dans Kubernetes | Vous savez créer un Pod, un namespace et un Service, puis tester avec `port-forward`. |
 | [TP03](tp/TP03-pod-deployment-service.md) | Déployer l’application | Vous avez déployé l’application et corrigé le problème d’accès à une image privée. |
 | [TP04](tp/TP04-configuration-ressources-noeuds.md) | Configuration, ressources et stockage | Vous avez modifié un ConfigMap, observé requests/limits et monté un volume `emptyDir`. |
 | [TP05](tp/TP05-administration-diagnostic-securite.md) | Diagnostic et sécurité | Vous avez diagnostiqué un Service sans endpoints et vérifié des droits RBAC. |
