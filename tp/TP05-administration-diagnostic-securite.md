@@ -115,6 +115,29 @@ Répondez à ces questions :
 - Pourquoi un Secret Kubernetes ne doit-il pas être commité dans Git ?
 - Pourquoi faut-il limiter les droits RBAC au strict nécessaire ?
 
+## Partie E — Observer l’état des nœuds et la supervision
+
+Kubernetes expose l’état de chaque nœud et les événements récents. Utilisez ces commandes :
+
+```bash
+kubectl get nodes
+kubectl describe node <nom-du-worker>
+kubectl get events -A --field-selector type=Warning
+```
+
+Remplacez `<nom-du-worker>` par le nom d’un nœud. Dans la sortie de `describe node`, repérez la section `Conditions` et les événements. Les conditions indiquent si le nœud est prêt et si certains problèmes sont détectés.
+
+**Node Problem Detector** est un composant qui surveille le nœud lui-même, par exemple le noyau, le disque ou le runtime des conteneurs. Il remonte les problèmes détectés sous forme de conditions et d’événements Kubernetes. Il n’est pas installé dans ce laboratoire.
+
+**Google Cloud Operations** (anciennement Stackdriver) est un exemple d’outillage de supervision proposé par un fournisseur cloud. Il peut centraliser les journaux, les métriques et les alertes d’un environnement cloud. Il n’est pas installé dans ce laboratoire.
+
+Distinguez ces quatre notions :
+
+- **Logs** : messages émis par une application ou un composant.
+- **Événements** : faits ponctuels enregistrés par Kubernetes, par exemple un échec de scheduling.
+- **Métriques** : mesures numériques suivies dans le temps, comme l’utilisation CPU ou mémoire.
+- **Alertes** : notifications déclenchées lorsqu’une règle ou un seuil est atteint.
+
 ## Nettoyage
 
 Supprimez les ressources RBAC créées pour ce TP :
@@ -137,6 +160,8 @@ Pour diagnostiquer, vérifiez l’état, les événements, la description de la 
 3. À quoi servent Role et RoleBinding ?
 4. Pourquoi la commande `kubectl auth can-i` est-elle utile ?
 5. Pourquoi faut-il tester l’effet d’une NetworkPolicy sur un CNI qui la prend en charge ?
+6. Quelle différence entre logs, événements, métriques et alertes ?
+7. Quel type de problème Node Problem Detector peut-il signaler ?
 
 
 ---
