@@ -123,8 +123,7 @@ echo
 Créez un Secret dans le namespace où ESO sera configuré :
 
 ```bash
-kubectl create namespace external-secrets --dry-run=client -o yaml | kubectl apply -f -
-kubectl -n external-secrets create secret generic vault-token \
+kubectl -n kube-training create secret generic vault-token \
   --from-literal=token="$VAULT_TOKEN"
 unset VAULT_TOKEN
 ```
@@ -151,7 +150,6 @@ spec:
         tokenSecretRef:
           name: vault-token
           key: token
-          namespace: external-secrets
 ```
 
 Appliquez le manifeste :
@@ -247,7 +245,7 @@ kubectl delete -f /tmp/flask-api-key-test.yaml
 kubectl delete -f /tmp/vault-externalsecret.yaml
 kubectl delete -f /tmp/vault-secretstore.yaml
 kubectl -n kube-training delete secret flask-api-key --ignore-not-found
-kubectl -n external-secrets delete secret vault-token --ignore-not-found
+kubectl -n kube-training delete secret vault-token --ignore-not-found
 rm -f /tmp/flask-api-key-test.yaml /tmp/vault-externalsecret.yaml /tmp/vault-secretstore.yaml
 ```
 
