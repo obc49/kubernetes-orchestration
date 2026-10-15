@@ -53,7 +53,7 @@ kubectl -n kube-training describe pod <nom-du-pod>
 kubectl -n kube-training get events --sort-by=.lastTimestamp
 ```
 
-Remplacez `<nom-du-pod>` par le nom réel du Pod. Repérez le message lié au téléchargement de l’image. Si le package GHCR est privé, Kubernetes ne peut pas le télécharger sans identifiants.
+Remplacez `<nom-du-pod>` par le nom réel du Pod. Repérez le message lié au téléchargement de l’image. Si le package GHCR est privé, Kubernetes ne peut pas le télécharger sans identifiants. Si les Pods démarrent du premier coup, le package est probablement public. Poursuivez tout de même le TP : les étapes suivantes vous montrent comment configurer l’accès à une image privée et comment Kubernetes utilise `imagePullSecrets`. Vérifiez ensuite la visibilité du package dans GitHub → Packages → Package settings et assurez-vous qu’elle est réglée sur **Private** pour observer le scénario complet.
 
 ## 4. Créer le secret qui autorise le téléchargement
 
