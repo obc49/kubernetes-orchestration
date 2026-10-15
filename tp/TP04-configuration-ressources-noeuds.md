@@ -89,46 +89,66 @@ Remplacez `<nom-du-pod>` par le nom réel d’un Pod.
 
 ## Partie D — Observer le placement avec nodeSelector
 
-Un `nodeSelector` demande à Kubernetes de placer le Pod sur un nœud qui possède un label précis.
+Un `nodeSelector` demande à Kubernetes de placer un Pod sur un nœud qui possède un label précis. Nous allons utiliser un Deployment de test pour ne pas modifier l’application principale.
 
-1. Affichez les noms des nœuds :
+1. Choisissez un worker et ajoutez-lui un label :
 
 ```bash
 kubectl get nodes
-```
-
-2. Choisissez un worker et ajoutez-lui un label :
-
-```bash
 kubectl label node <nom-du-worker> tp04=ok
 kubectl get nodes --show-labels
 ```
 
-3. Dans une copie de test du Deployment, ajoutez sous `spec.template.spec` :
+Remplacez `<nom-du-worker>` par le nom réel du worker.
+
+2. Créez une copie du Deployment :
+
+```bash
+cp manifests/20-deployment.yaml /tmp/deployment-tp04.yaml
+```
+
+Dans `/tmp/deployment-tp04.yaml`, effectuez les modifications suivantes :
+
+- `metadata.name` : `flask-app-tp04`
+- `spec.replicas` : `1`
+- `spec.selector.matchLabels.app.kubernetes.io/name` : `flask-app-tp04`
+- `spec.template.metadata.labels.app.kubernetes.io/name` : `flask-app-tp04`
+- Sous `spec.template.spec`, ajoutez :
 
 ```yaml
-nodeSelector:
-  tp04: ok
+      nodeSelector:
+        tp04: ok
 ```
 
-Appliquez uniquement cette copie de test. Vérifiez sur quel nœud le Pod est placé avec `kubectl get pods -o wide`.
+Conservez l’image et `imagePullSecrets` du fichier d’origine. Si l’image GHCR est privée, le Deployment de test doit lui aussi référencer `ghcr-pull`.
 
-4. Dans la copie de test, remplacez la valeur par `absent`. Observez l’état du Pod et les événements :
+3. Appliquez le Deployment de test et observez le nœud choisi :
 
 ```bash
-kubectl describe pod <nom-du-pod-de-test>
-kubectl get events --sort-by=.lastTimestamp
+kubectl apply -f /tmp/deployment-tp04.yaml
+kubectl -n kube-training rollout status deployment/flask-app-tp04
+kubectl -n kube-training get pods -l app.kubernetes.io/name=flask-app-tp04 -o wide
 ```
 
-Un Pod sans nœud compatible reste généralement en `Pending` avec un événement de type `FailedScheduling`. Restaurez la configuration et supprimez les ressources de test.
-
-5. Retirez le label ajouté :
+4. Dans le même fichier, remplacez `tp04: ok` par `tp04: absent`, puis appliquez la modification :
 
 ```bash
+kubectl apply -f /tmp/deployment-tp04.yaml
+kubectl -n kube-training get pods -l app.kubernetes.io/name=flask-app-tp04
+kubectl -n kube-training get events --sort-by=.lastTimestamp
+```
+
+Le nouveau Pod reste normalement `Pending`, car aucun nœud ne porte le label demandé. L’application principale `flask-app` continue de fonctionner : vous avez modifié uniquement le Deployment de test.
+
+5. Supprimez le Deployment de test et le label :
+
+```bash
+kubectl -n kube-training delete deployment flask-app-tp04
 kubectl label node <nom-du-worker> tp04-
+rm -f /tmp/deployment-tp04.yaml
 ```
 
-## Partie E — Monter un volume emptyDir
+## Partie E — Monter un volume emptyDir (facultatif)
 
 Un volume `emptyDir` est un répertoire temporaire créé pour un Pod. Les conteneurs du même Pod peuvent le partager. Les données restent disponibles pendant la vie du Pod, mais elles sont perdues quand ce Pod est supprimé et remplacé.
 
@@ -176,6 +196,60 @@ kubectl -n kube-training exec deployment/flask-app -- sh -c 'ls -l /tmp/formatio
 
 Le nouveau Pod possède un nouveau volume `emptyDir` : l’ancien fichier n’est plus là.
 
+## Partie F — Mettre à jour l’application et revenir en arrière (environ 15 minutes)
+
+Cette partie vous montre comment publier une nouvelle version, effectuer un rolling update et revenir à la version précédente.
+
+1. Dans `app/app.py`, modifiez le message par défaut retourné par la page d’accueil. Par exemple, remplacez `Application Flask opérationnelle.` par `Version TP04-2 : application mise à jour.`
+
+2. Construisez et publiez une nouvelle image. Utilisez le même compte GHCR que dans le TP01 :
+
+```bash
+export OWNER="votre-identifiant-github"
+export IMAGE="ghcr.io/$OWNER/kubernetes-orchestration"
+docker build -t "$IMAGE:tp04-2" .
+docker push "$IMAGE:tp04-2"
+```
+
+Vérifiez que le package reste privé. Le Secret `ghcr-pull` créé au TP03 doit toujours permettre de télécharger cette image.
+
+3. Remplacez l’image du Deployment :
+
+```bash
+kubectl -n kube-training set image deployment/flask-app flask-app="$IMAGE:tp04-2"
+kubectl -n kube-training rollout status deployment/flask-app
+```
+
+4. Observez les ReplicaSets et l’historique :
+
+```bash
+kubectl -n kube-training get replicasets
+kubectl -n kube-training rollout history deployment/flask-app
+```
+
+Vous devez voir l’ancien ReplicaSet et le nouveau. Kubernetes remplace progressivement les Pods selon la stratégie de mise à jour du Deployment.
+
+5. Revenez à la version précédente :
+
+```bash
+kubectl -n kube-training rollout undo deployment/flask-app
+kubectl -n kube-training rollout status deployment/flask-app
+```
+
+6. Vérifiez le message précédent avec un `port-forward` :
+
+```bash
+kubectl -n kube-training port-forward svc/flask-app 8080:80
+```
+
+Dans un autre terminal :
+
+```bash
+curl http://127.0.0.1:8080/
+```
+
+Arrêtez le `port-forward` avec `Ctrl+C`. Le message précédent doit être revenu. Si le port 8080 est déjà utilisé, choisissez un autre port local libre.
+
 ## À retenir
 
 - Un ConfigMap sert à injecter de la configuration non sensible.
@@ -183,6 +257,7 @@ Le nouveau Pod possède un nouveau volume `emptyDir` : l’ancien fichier n’es
 - Les requests influencent le placement ; les limits définissent des plafonds.
 - `nodeSelector` impose une contrainte simple sur les labels des nœuds.
 - `emptyDir` est temporaire : sa durée de vie est celle du Pod, pas celle du conteneur.
+- Un rolling update remplace progressivement les Pods ; `rollout undo` permet de revenir à la révision précédente.
 - Un PVC sert à demander un stockage persistant ; il n’est pas créé dans cet exercice.
 
 ## Questions
