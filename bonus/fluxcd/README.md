@@ -36,7 +36,7 @@ La commande `flux check --pre` vérifie que le cluster répond et que les prére
 
 ## 2. Préparer un dépôt Git dédié
 
-Sur GitHub, créez un dépôt vide nommé `kubernetes-flux-lab`. Ne réutilisez pas le dépôt du cours : le TP sera plus simple à nettoyer.
+Sur GitHub, créez un dépôt **public** vide nommé `kubernetes-flux-lab`. Le dépôt doit être public pour que la ressource `GitRepository` de ce TP puisse le lire sans `secretRef`. Ne réutilisez pas le dépôt du cours : le TP sera plus simple à nettoyer.
 
 Dans votre terminal, définissez votre identifiant GitHub et le nom du dépôt :
 
