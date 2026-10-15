@@ -43,11 +43,14 @@ Formation de deux jours, soit 14 heures. Le parcours suit une progression simple
 - comprendre le rôle des outils de détection des problèmes de nœud et de supervision ;
 - exposer une application HTTP avec Gateway API.
 
-## Références utiles
+## Documentation officielle
 
-- [Introduction à Kubernetes — Containers Goffinet](https://containers.goffinet.org/content/k8s-01-introduction-a-kubernetes/)
-- [Documentation Kubernetes](https://kubernetes.io/docs/home/)
-- [Référence rapide kubectl](https://kubernetes.io/docs/reference/kubectl/quick-reference/)
-- [Documentation Kind](https://kind.sigs.k8s.io/)
-- [Documentation Gateway API](https://gateway-api.sigs.k8s.io/)
-- [Documentation NGINX Gateway Fabric](https://docs.nginx.com/nginx-gateway-fabric/)
+- [Kubernetes — Documentation](https://kubernetes.io/docs/home/)
+- [Kubernetes — Concepts](https://kubernetes.io/docs/concepts/)
+- [kubectl — Référence rapide](https://kubernetes.io/docs/reference/kubectl/quick-reference/)
+- [Kind — Documentation](https://kind.sigs.k8s.io/)
+- [Gateway API — Documentation](https://gateway-api.sigs.k8s.io/)
+- [NGINX Gateway Fabric — Documentation](https://docs.nginx.com/nginx-gateway-fabric/)
+- [Flux — Documentation](https://fluxcd.io/flux/)
+- [External Secrets Operator — Documentation](https://external-secrets.io/)
+- [HashiCorp Vault — Documentation](https://developer.hashicorp.com/vault/docs)
