@@ -10,13 +10,7 @@ Depuis la racine du dépôt :
 kubectl get nodes
 ```
 
-Les trois nœuds doivent être `Ready`. Le fichier `kind/cluster.yaml` relie le port 80 de votre poste au port 30080 du nœud Kind. Si le cluster a été créé sans ce mapping, recréez-le avant de poursuivre. Attention : supprimer un cluster efface les ressources qu’il contient.
-
-```bash
-kind delete cluster --name kube-training
-kind create cluster --config kind/cluster.yaml --wait 120s
-kubectl get nodes -o wide
-```
+Les trois nœuds doivent être `Ready`. Aucun port fixe de votre poste n’est réservé par Kind. L’accès HTTP sera réalisé avec `kubectl port-forward` au TP06.
 
 ## 2. Installer les ressources Gateway API
 
@@ -93,10 +87,10 @@ helm list -n nginx-gateway
 kubectl -n nginx-gateway get pods,svc
 kubectl get gatewayclass
 kubectl -n nginx-gateway get deployments
-kubectl -n nginx-gateway logs deployment/<nom-affiché>
+kubectl -n nginx-gateway logs deployment/$(kubectl -n nginx-gateway get deployments -o jsonpath='{.items[0].metadata.name}')
 ```
 
-Remplacez `<nom-affiché>` par le nom retourné par la première commande.
+La deuxième commande récupère automatiquement le nom du Deployment et affiche ses logs.
 
 Si le NodePort 30080 n’apparaît pas, vérifiez les valeurs du chart installé et la documentation de la version 2.7.2 avant de poursuivre.
 
