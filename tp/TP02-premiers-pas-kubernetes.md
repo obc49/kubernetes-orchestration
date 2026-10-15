@@ -127,3 +127,8 @@ La suppression du namespace supprime les ressources qu’il contient.
 3. Comment le Service `web-svc` trouve-t-il le Pod NGINX ?
 4. Que se passe-t-il si aucun Pod ne correspond au selector du Service ?
 5. Pourquoi utilise-t-on `port-forward` dans ce TP ?
+
+
+---
+
+**Suite :** [TP03 — Déployer notre application sur Kubernetes](TP03-pod-deployment-service.md)
