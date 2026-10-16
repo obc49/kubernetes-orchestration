@@ -84,11 +84,14 @@ kubectl -n kube-training get secret ghcr-pull
 
 ## 5. Mettre à jour le Deployment
 
-Ouvrez de nouveau `manifests/20-deployment.yaml`. Dans la section `spec.template.spec`, ajoutez ces lignes avant `containers:` :
+Ouvrez de nouveau `manifests/20-deployment.yaml`. Dans la section `spec.template.spec`, ajoutez les deux lignes `imagePullSecrets` juste avant `containers:`, en respectant exactement l’indentation ci-dessous :
 
 ```yaml
-imagePullSecrets:
-  - name: ghcr-pull
+    spec:
+      imagePullSecrets:
+        - name: ghcr-pull
+      containers:
+        - name: flask-app
 ```
 
 Enregistrez le fichier puis réappliquez-le :
