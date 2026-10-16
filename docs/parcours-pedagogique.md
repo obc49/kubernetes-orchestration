@@ -4,28 +4,28 @@ Formation de deux jours, soit 14 heures. Le parcours suit une progression simple
 
 ## Jour 1 — Découvrir Kubernetes et déployer une application
 
-| Séquence | Contenu | TP |
-|---|---|---|
-| Introduction | Pourquoi Kubernetes, modèle déclaratif, état souhaité | Démonstrations |
-| Architecture | Control plane, API Server, etcd, scheduler, controller manager, kubelet, nœuds et Pods | Démonstrations |
-| Application et conteneurs | Application Flask, Dockerfile, image, conteneur, endpoints | TP01 |
-| Registre d’images | GHCR, tags, publication d’une image | TP01 |
-| Installation | Options d’installation (Minikube, kubeadm, Kind), kubectl et création du cluster au début du TP02 | TP02 |
-| Premiers objets Kubernetes | Namespace, Pod, labels, selectors, Service, port-forward | TP02 |
-| Déploiement de l’application | Deployment, ReplicaSet, Service, image privée et imagePullSecret | TP03 |
+| Séquence | Contenu | TP | Durée indicative | Durée indicative |
+|---|---|---|---|---|
+| Introduction | Pourquoi Kubernetes, modèle déclaratif, état souhaité | Démonstrations | |
+| Architecture | Control plane, API Server, etcd, scheduler, controller manager, kubelet, nœuds et Pods | Démonstrations | |
+| Application et conteneurs | Application Flask, Dockerfile, image, conteneur, endpoints | TP01 | 1 h 30 |
+| Registre d’images | GHCR, tags, publication d’une image | TP01 | 30 min |
+| Installation | Options d’installation (Minikube, kubeadm, Kind), kubectl et création du cluster au début du TP02 | TP02 | 1 h |
+| Premiers objets Kubernetes | Namespace, Pod, labels, selectors, Service, port-forward | TP02 | 2 h |
+| Déploiement de l’application | Deployment, ReplicaSet, Service, image privée et imagePullSecret | TP03 | 2 h  |
 
 ## Jour 2 — Configurer, administrer et exposer l’application
 
 | Séquence | Contenu | TP |
 |---|---|---|
-| Configuration | ConfigMap et Secret | TP04 |
-| Ressources et placement | Requests, limits CPU/mémoire, nodeSelector et événements de scheduling | TP04 |
-| Stockage | Volume emptyDir, durée de vie des données, introduction au PVC et au stockage persistant | TP04 |
-| Administration | get, describe, logs, exec, events, états des Pods et méthode de diagnostic | TP05 |
-| Sécurité | RBAC, ServiceAccount, moindre privilège, Secrets, NetworkPolicy et limites du lab | TP05 |
-| Supervision | Logs, événements, métriques, détection de problèmes de nœud et solutions de supervision cloud | TP05 |
-| Exposition HTTP | Gateway API, GatewayClass, Gateway, HTTPRoute et NGINX Gateway Fabric | TP06 |
-| Synthèse | Vérification du fonctionnement, diagnostic et restitution | TP03 à TP06 |
+| Configuration | ConfigMap et Secret | TP04 | 1 h |
+| Ressources et placement | Requests, limits CPU/mémoire, nodeSelector et événements de scheduling | TP04 | 1 h |
+| Stockage | Volume emptyDir, durée de vie des données, introduction au PVC et au stockage persistant | TP04 | 1 h |
+| Administration | get, describe, logs, exec, events, états des Pods et méthode de diagnostic | TP05 | 1 h |
+| Sécurité | RBAC, ServiceAccount, moindre privilège, Secrets, NetworkPolicy et limites du lab | TP05 | 1 h |
+| Supervision | Logs, événements, métriques, détection de problèmes de nœud et solutions de supervision cloud | TP05 | 1 h |
+| Exposition HTTP | Gateway API, GatewayClass, Gateway, HTTPRoute et NGINX Gateway Fabric | TP06 | 1 h |
+| Synthèse | Vérification du fonctionnement, diagnostic et restitution | TP03 à TP06 | |
 
 ## Objectifs pédagogiques
 
