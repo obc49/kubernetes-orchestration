@@ -13,6 +13,8 @@ Ce dépôt contient l’application fil rouge, les manifestes et les six TP de l
 | [TP05](tp/TP05-administration-diagnostic-securite.md) | Diagnostic et sécurité | Vous avez diagnostiqué un Service sans endpoints et vérifié des droits RBAC. |
 | [TP06](tp/TP06-gateway-api.md) | Gateway API | Vous avez exposé l’application en HTTP depuis votre poste. |
 
+Le détail de la progression sur les deux journées se trouve dans [le parcours pédagogique](docs/parcours-pedagogique.md).
+
 ## Prérequis
 
 L’environnement recommandé pour la formation est **Ubuntu sous WSL2 avec Docker Desktop et l’intégration WSL activée**.
@@ -99,7 +101,8 @@ pytest.ini                   configuration des tests
 kind/cluster.yaml            configuration du cluster Kind
 manifests/                   manifestes utilisés pendant les TP
 tp/                          énoncés des six TP
-docs/installation-gateway.md guide d’installation pour le TP06
+docs/installation-gateway.md     guide d’installation pour le TP06
+docs/parcours-pedagogique.md      progression des deux journées
 .github/workflows/            tests et publication de l’image GHCR
 bonus/                        exercices complémentaires
 ```
