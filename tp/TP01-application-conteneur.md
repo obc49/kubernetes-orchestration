@@ -8,7 +8,7 @@ Ce TP se fait entièrement sur votre poste, avec Docker. Le cluster Kubernetes e
 
 ## 1. Découvrir l’application
 
-Depuis la racine du dépôt :
+Depuis la racine de votre copie du dépôt :
 
 ```bash
 ls
@@ -22,11 +22,11 @@ Créez un environnement Python et lancez les tests :
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r app/requirements.txt pytest
+pip install -r app/requirements.txt 'pytest>=7'
 pytest -q
 ```
 
-Résultat attendu : les tests passent.
+Résultat attendu : les tests passent. Si la commande n’est pas trouvée, utilisez `python -m pytest -q`.
 
 ## 2. Construire et tester l’image en local
 
