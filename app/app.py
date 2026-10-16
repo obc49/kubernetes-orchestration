@@ -54,5 +54,5 @@ def ready():
 
 
 if __name__ == "__main__":
-    # Flask's built-in server is sufficient for this training lab only.
+    # Le serveur intégré de Flask suffit pour ce lab de formation uniquement.
     app.run(host="0.0.0.0", port=5000)

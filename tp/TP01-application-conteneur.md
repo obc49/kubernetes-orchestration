@@ -1,42 +1,127 @@
-# TP01 — Application et conteneur Docker
+# TP01 — De l’application à l’image publiée
 
-**Objectif :** comprendre et tester l’application qui servira de fil rouge avant son déploiement sur Kubernetes.
+Ce TP se fait entièrement sur votre poste, avec Docker. Le cluster Kubernetes est créé au TP02.
 
-## Travail demandé
+## Objectif
 
-1. Repérer le point d’entrée, les dépendances et les endpoints.
-2. Créer un environnement Python et exécuter les tests.
-3. Construire l’image Docker.
-4. Lancer le conteneur en définissant `APP_ENV` et `APP_MESSAGE`.
-5. Tester `/`, `/health` et `/ready`.
-6. Consulter les logs et nettoyer le conteneur.
+À la fin de ce TP, vous saurez lancer l’application Flask, la conteneuriser, construire une image Docker et la publier dans votre registre GHCR. Cette image sera utilisée dans les TP Kubernetes.
 
-## Commandes
+## 1. Découvrir l’application
+
+Depuis la racine du dépôt :
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r app/requirements.txt pytest
-pytest -q
+ls
+ls app
+```
 
-docker build -t kubernetes-orchestration:training .
-docker run --rm -d --name kube-training-test -p 5000:5000 \
+Repérez le fichier `app/app.py`, les dépendances et les tests.
+
+Créez un environnement Python et lancez les tests :
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r app/requirements.txt 'pytest>=7'
+pytest -q
+```
+
+Résultat attendu : les tests passent. Si la commande n’est pas trouvée, utilisez `python -m pytest -q`.
+
+## 2. Construire et tester l’image en local
+
+Construisez l’image :
+
+```bash
+docker build -t kubernetes-orchestration:tp01 .
+docker images kubernetes-orchestration
+```
+
+Lancez le conteneur :
+
+```bash
+docker run --rm -d --name flask-tp01 -p 5000:5000 \
   -e APP_ENV=formation \
   -e APP_MESSAGE="Bonjour depuis Docker" \
-  kubernetes-orchestration:training
+  kubernetes-orchestration:tp01
+```
 
+Testez les trois endpoints :
+
+```bash
 curl -i http://localhost:5000/
 curl -i http://localhost:5000/health
 curl -i http://localhost:5000/ready
-docker logs kube-training-test
-docker rm -f kube-training-test
+docker logs flask-tp01
+docker rm -f flask-tp01
 ```
 
-Si le port 5000 est déjà utilisé, remplacez le port hôte par `5001:5000` et adaptez les URL.
+Si le port 5000 est déjà utilisé, remplacez `5000:5000` par `5001:5000` et utilisez le port 5001 dans les URL.
 
-## Débrief
+## 3. Préparer l’accès à GHCR
 
-- Différence entre image, conteneur et processus ?
-- Pourquoi l’application écoute-t-elle sur `0.0.0.0` ?
-- Pourquoi la configuration et les secrets ne doivent-ils pas être intégrés à l’image ?
-- Quelle différence entre les endpoints `/health` et `/ready` ?
+GHCR est le registre d’images de GitHub. Pour publier votre propre image, utilisez un compte GitHub autorisé à publier un package. Si vous travaillez à partir d’un fork, remplacez `OWNER` par votre identifiant GitHub.
+
+Créez un token avec le droit minimal nécessaire pour publier des packages (`write:packages`). Ne réutilisez pas un token professionnel et ne l’ajoutez jamais au dépôt.
+
+Connectez Docker à GHCR. La saisie du token reste masquée :
+
+```bash
+read -p "Identifiant GitHub : " GHCR_USER
+read -s -p "Token GHCR : " GHCR_TOKEN
+echo
+printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+unset GHCR_TOKEN
+```
+
+Si la connexion échoue, vérifiez les droits du token et l’accès au package.
+
+## 4. Construire et publier votre image
+
+Choisissez un tag unique pour votre image :
+
+```bash
+export OWNER="votre-identifiant-github"
+export IMAGE="ghcr.io/$OWNER/kubernetes-orchestration"
+export TAG="tp01-1"
+```
+
+Remplacez `votre-identifiant-github` par votre identifiant GitHub. Construisez, taguez et publiez l’image :
+
+```bash
+docker build -t "$IMAGE:$TAG" .
+docker push "$IMAGE:$TAG"
+```
+
+Vérifiez que la publication est terminée dans GitHub → Packages. Ouvrez **Package settings** et vérifiez que la visibilité du package est **Private**. Si nécessaire, changez-la avant de poursuivre. Le TP03 s’appuie sur un package privé pour vous faire observer le problème de téléchargement puis le corriger.
+
+Notez l’adresse exacte de votre image, par exemple `ghcr.io/mon-compte/kubernetes-orchestration:tp01-1`. Vous en aurez besoin au TP03.
+
+## 5. Nettoyer le poste
+
+```bash
+docker logout ghcr.io
+unset OWNER IMAGE TAG GHCR_USER
+```
+
+Ne supprimez pas l’image publiée : elle sera utilisée dans les TP suivants.
+
+## À retenir
+
+- Une image est le paquet qui contient l’application et ce dont elle a besoin pour démarrer.
+- Un conteneur est une instance lancée à partir d’une image.
+- GHCR stocke et distribue les images.
+- Un tag permet de désigner une version de l’image.
+- Un registre privé exige une authentification pour télécharger l’image.
+
+## Questions
+
+1. Quelle différence entre image et conteneur ?
+2. À quoi servent `/health` et `/ready` ?
+3. Quelle est l’adresse complète de l’image que vous venez de publier ?
+4. Pourquoi ne faut-il jamais mettre le token dans le Dockerfile ou dans Git ?
+
+
+---
+
+**Suite :** [TP02 — Premiers pas dans Kubernetes](TP02-premiers-pas-kubernetes.md)

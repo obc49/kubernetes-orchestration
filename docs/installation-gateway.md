@@ -1,38 +1,28 @@
-# Guide formateur — Gateway API et NGINX Gateway Fabric dans Kind
+# Guide d’installation — Gateway API dans Kind
 
-Ce guide décrit la topologie du TP06. Le parcours pratique utilise Kind, Gateway API et NGINX Gateway Fabric. **MetalLB n’est pas requis** : l’accès depuis l’hôte utilise un NodePort et un port mapping Kind.
+Ce guide accompagne le TP06. Suivez les étapes dans l’ordre. Il utilise Kind, Gateway API et NGINX Gateway Fabric. MetalLB n’est pas nécessaire.
 
-## Topologie
+## 1. Vérifier le cluster Kind
 
-```text
-curl sur l’hôte
-  -> 127.0.0.1:80
-  -> port mapping Kind vers le nœud sur 30080
-  -> Service de données NGINX (NodePort 30080)
-  -> Gateway / HTTPRoute
-  -> Service ClusterIP flask-app:80
-  -> Pods Flask:5000
-```
-
-## 1. Préparer Kind
-
-La configuration `kind/cluster.yaml` mappe le port 80 de l’hôte vers le port 30080 du nœud control-plane. Un cluster créé avant l’ajout du mapping doit être recréé pour le prendre en compte.
+Depuis la racine du dépôt :
 
 ```bash
-kind delete cluster --name kube-training
-kind create cluster --config kind/cluster.yaml --wait 120s
-kubectl get nodes -o wide
+kubectl get nodes
 ```
 
-Prévenir les participants avant suppression : cela détruit l’état du laboratoire.
+Les trois nœuds doivent être `Ready`. Aucun port fixe de votre poste n’est réservé par Kind. L’accès HTTP sera réalisé avec `kubectl port-forward` au TP06.
 
-## 2. Installer Gateway API et NGINX Gateway Fabric
+## 2. Installer les ressources Gateway API
 
-Version de laboratoire : NGINX Gateway Fabric **2.7.2**.
+Nous utilisons NGINX Gateway Fabric 2.7.2 pour ce lab. Installez les CRD Gateway API standard correspondant à cette version :
 
 ```bash
-kubectl apply -f "https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.7.2"
+kubectl kustomize "https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.7.2" | kubectl apply -f -
+```
 
+## 3. Installer NGINX Gateway Fabric avec Helm
+
+```bash
 helm install ngf oci://ghcr.io/nginx/charts/nginx-gateway-fabric \
   --version 2.7.2 \
   --create-namespace --namespace nginx-gateway \
@@ -42,7 +32,7 @@ helm install ngf oci://ghcr.io/nginx/charts/nginx-gateway-fabric \
   --set-json 'nginx.service.nodePorts=[{"port":30080,"listenerPort":80}]'
 ```
 
-Vérifier les valeurs acceptées par le chart si la version est modifiée. Ne pas basculer vers un Service LoadBalancer sans nécessité : le parcours n’installe pas de contrôleur d’adresses IP.
+Attendez la fin de l’installation, puis vérifiez les Pods et les Services :
 
 ```bash
 kubectl -n nginx-gateway get pods,svc
@@ -50,59 +40,62 @@ kubectl get gatewayclass
 kubectl describe gatewayclass nginx
 ```
 
-Attendu : contrôleur opérationnel et GatewayClass `nginx` acceptée. Le Service de données doit exposer le NodePort `30080`. Si le chart n’assigne pas ce port comme attendu, inspecter `kubectl -n nginx-gateway get svc -o yaml` et corriger les valeurs du chart avant de poursuivre.
+Les Pods du contrôleur doivent être `Running` et la GatewayClass `nginx` doit être acceptée. Le Service de données NGINX sera créé plus tard, lorsque vous appliquerez la Gateway au TP06.
 
-## 3. Déployer l’application
+## 4. Vérifier l’application
 
-Exécuter TP02 pour créer le Secret de pull GHCR et TP03 pour appliquer les manifests applicatifs :
+Avant de créer la Gateway, l’application doit fonctionner :
 
 ```bash
-kubectl -n kube-training rollout status deployment/flask-app
 kubectl -n kube-training get pods,svc,endpoints
+kubectl -n kube-training rollout status deployment/flask-app
 ```
 
-## 4. Créer Gateway et HTTPRoute
+Si les Pods ne sont pas prêts, revenez au TP03 et corrigez le problème avant de continuer.
+
+## 5. Comprendre le chemin du trafic
+
+Le chemin réseau de ce TP est :
+
+```text
+Votre poste : 127.0.0.1:8080
+        |
+        v
+kubectl port-forward vers le Service de données NGINX
+        |
+        v
+Service flask-gateway-nginx (namespace kube-training)
+        |
+        v
+Gateway -> HTTPRoute -> Service flask-app:80 -> Pods Flask:5000
+```
+
+Le Service de données est créé dans le namespace de la Gateway, ici `kube-training`, lorsque la Gateway est attachée à la GatewayClass. Son nom est `flask-gateway-nginx`. Le Service est de type NodePort, qui serait un point d’entrée sur un vrai cluster. Dans ce lab, utilisez `port-forward` pour ne dépendre d’aucun port fixe de votre poste.
+
+Après avoir créé la Gateway au TP06, vérifiez-le avec :
 
 ```bash
-kubectl apply -f manifests/40-gateway.yaml
-kubectl apply -f manifests/50-httproute.yaml
-kubectl -n kube-training get gateway,httproute
-kubectl -n kube-training describe gateway flask-gateway
-kubectl -n kube-training describe httproute flask-route
-kubectl -n kube-training get svc
+kubectl -n kube-training get svc flask-gateway-nginx
 ```
 
-Inspecter les Services dans les deux namespaces :
+## 6. Si l’installation ne fonctionne pas
+
+Vérifiez les éléments dans cet ordre :
 
 ```bash
-kubectl -n nginx-gateway get svc
-kubectl -n kube-training get svc
+helm list -n nginx-gateway
+kubectl -n nginx-gateway get pods,svc
+kubectl get gatewayclass
+kubectl -n nginx-gateway get deployments
+kubectl -n nginx-gateway logs deployment/$(kubectl -n nginx-gateway get deployments -o jsonpath='{.items[0].metadata.name}')
 ```
 
-Le Service de données est créé pour la Gateway. Son nom dépend de la configuration/version ; identifier le Service associé à `flask-gateway` et vérifier ses ports. Ne pas confondre ce Service de données avec le Service du contrôleur `ngf` dans `nginx-gateway`.
+La dernière commande récupère automatiquement le nom du Deployment et affiche ses logs.
 
-## 5. Tester depuis l’hôte
+Le NodePort 30080 n’est pas utilisé par les TP : l’accès HTTP se fait en port-forward. S’il n’apparait pas, vous pouvez poursuivre.
 
-```bash
-curl -i -H 'Host: flask.local' http://127.0.0.1/
-curl -i -H 'Host: flask.local' http://127.0.0.1/health
-curl -i -H 'Host: flask.local' http://127.0.0.1/ready
-```
+## Version et limites du lab
 
-Si l’accès direct ne fonctionne pas, vérifier successivement :
-1. le port mapping dans `kind/cluster.yaml` ;
-2. le NodePort 30080 du Service de données ;
-3. les Pods/logs du contrôleur et les conditions GatewayClass/Gateway/HTTPRoute ;
-4. les endpoints du Service `flask-app` ;
-5. le host attendu par la règle HTTPRoute.
+Ce TP utilise les versions épinglées de Gateway API et NGINX Gateway Fabric indiquées ci-dessus. Si vous changez de version, vérifiez la compatibilité des CRD et des valeurs Helm.
 
-Diagnostic de secours pour isoler l’application :
-
-```bash
-kubectl -n kube-training port-forward svc/flask-app 8080:80
-curl -i http://localhost:8080/health
-```
-
-## Limites
-
-Kind et NodePort servent à illustrer le chemin du trafic dans un laboratoire. Ce montage n’est pas l’équivalent d’un LoadBalancer managé, d’une IP publique, d’une terminaison TLS de production ou d’une architecture hautement disponible.
+Kind et NodePort servent à comprendre le routage HTTP dans un lab. Ce montage n’est pas un LoadBalancer cloud et ne configure ni IP publique, ni TLS de production, ni haute disponibilité.

@@ -1,102 +1,142 @@
-# Kubernetes Orchestration — projet fil rouge
+# Kubernetes — Orchestration des conteneurs
 
-Projet pédagogique pour la formation **Kubernetes – Orchestration des conteneurs** (14 heures, deux jours). Le dépôt conserve exactement **six TP apprenants, TP01 à TP06**.
+Ce dépôt contient l’application fil rouge, les manifestes et les six TP de la formation. Suivez les TP dans l’ordre : chaque TP réutilise ce qui a été vu précédemment.
 
-## Parcours des six TP
+## Parcours
 
-| TP | Sujet | Résultat attendu |
+| TP | Sujet | À la fin du TP |
 |---|---|---|
-| [TP01](tp/TP01-application-conteneur.md) | Application et conteneur Docker | Application testée localement et image construite |
-| [TP02](tp/TP02-ghcr-image-privee.md) | Image privée GHCR et authentification | Image identifiée et Secret `ghcr-pull` créé dans le bon namespace |
-| [TP03](tp/TP03-pod-deployment-service.md) | Pod, Deployment, Service et port-forward | Application déployée et accessible en local |
-| [TP04](tp/TP04-configuration-ressources-noeuds.md) | Configuration, ressources, placement et stockage | ConfigMap/Secret compris, requests/limits et placement analysés |
-| [TP05](tp/TP05-administration-diagnostic-securite.md) | Administration, diagnostic et sécurité | Incident diagnostiqué avec kubectl et contrôles de sécurité expliqués |
-| [TP06](tp/TP06-gateway-api.md) | Gateway API et NGINX Gateway Fabric | Route HTTP fonctionnelle depuis l’hôte |
+| [TP01](tp/TP01-application-conteneur.md) | Application, Docker et GHCR | Vous avez construit et publié l’image de l’application. |
+| [TP02](tp/TP02-premiers-pas-kubernetes.md) | Premiers pas dans Kubernetes | Vous savez créer un Pod, un namespace et un Service, puis tester avec `port-forward`. |
+| [TP03](tp/TP03-pod-deployment-service.md) | Déployer l’application | Vous avez déployé l’application et corrigé le problème d’accès à une image privée. |
+| [TP04](tp/TP04-configuration-ressources-noeuds.md) | Configuration, ressources et stockage | Vous avez modifié un ConfigMap, observé requests/limits et monté un volume `emptyDir`. |
+| [TP05](tp/TP05-administration-diagnostic-securite.md) | Diagnostic et sécurité | Vous avez diagnostiqué un Service sans endpoints et vérifié des droits RBAC. |
+| [TP06](tp/TP06-gateway-api.md) | Gateway API | Vous avez exposé l’application en HTTP depuis votre poste. |
 
-FluxCD et Vault + External Secrets Operator restent des **bonus hors socle**. MetalLB n’est pas utilisé dans le parcours.
+Le détail de la progression sur les deux journées se trouve dans [le parcours pédagogique](docs/parcours-pedagogique.md).
 
-## Prérequis et outillage
+## Prérequis
 
-- Bases Linux, TCP/IP, virtualisation et conteneurs.
-- Git, Docker Engine (Docker Desktop sous Windows/macOS ou Docker Engine sous Linux), `kubectl`, Kind, Helm 3 et `curl`.
-- Bash recommandé. Sous Windows, utiliser Ubuntu/WSL2 avec un moteur Docker fonctionnel.
-- Python 3.11+ uniquement pour tester l’application hors conteneur.
-- Accès Internet pour récupérer les images et les charts.
+L’environnement recommandé pour la formation est **Ubuntu sous WSL2 avec Docker Desktop et l’intégration WSL activée**.
 
-Kind est l’environnement pratique commun. Minikube et kubeadm sont présentés comme options d’installation, sans demander aux participants d’installer plusieurs clusters.
+Installez et vérifiez les outils suivants avant de commencer :
 
-## Tester l’application et construire l’image
+- [Git — installation](https://git-scm.com/downloads)
+- [Docker — installation](https://docs.docker.com/get-started/get-docker/)
+- [kubectl — installation](https://kubernetes.io/docs/tasks/tools/#kubectl)
+- [Kind — installation](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
+- [Helm 3 — installation](https://helm.sh/docs/intro/install/) (utilisé au TP06)
+- [curl — téléchargement](https://curl.se/download.html)
+- [Python 3.11 ou plus récent — téléchargement](https://www.python.org/downloads/) (TP01)
+
+Vérifiez que les commandes suivantes fonctionnent :
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r app/requirements.txt pytest
-pytest -q
-
-docker build -t kubernetes-orchestration:training .
-docker run --rm -d --name kube-training-test -p 5000:5000 \
-  -e APP_ENV=formation \
-  -e APP_MESSAGE="Bonjour depuis Docker" \
-  kubernetes-orchestration:training
-curl -i http://localhost:5000/
-curl -i http://localhost:5000/health
-curl -i http://localhost:5000/ready
-docker logs kube-training-test
-docker rm -f kube-training-test
+git --version
+docker version
+kubectl version --client
+kind version
+helm version
+curl --version
+python3 --version
 ```
 
-## Image GHCR privée
+Docker doit pouvoir démarrer des conteneurs. Si `docker version` affiche une erreur de connexion au daemon, corrigez Docker avant de commencer.
 
-Le workflow [publish-ghcr.yml](.github/workflows/publish-ghcr.yml) publie l’image lors d’un push sur `main`, avec un tag SHA et `latest`. La visibilité privée du package doit être vérifiée dans GitHub Packages ; le workflow ne définit pas cette visibilité à lui seul.
+## Votre copie du dépôt
 
-Pour le cours, utiliser le tag d’image validé par le formateur. Créer le Secret `ghcr-pull` dans le namespace `kube-training` avant de déployer le Deployment. Ne jamais versionner de token.
+Chaque participant travaille dans sa propre copie du dépôt. Vous pourrez ainsi modifier les manifestes, publier votre image et conserver votre travail après la formation.
 
-## Déploiement local
+1. Ouvrez https://github.com/oboyo-training/kubernetes-orchestration et cliquez sur **Fork**, en haut à droite. Conservez le nom proposé.
+2. Clonez votre fork, et non le dépôt d’origine :
+
+```bash
+git clone https://github.com/VOTRE-IDENTIFIANT/kubernetes-orchestration.git
+cd kubernetes-orchestration
+```
+
+3. Vérifiez que l’origine est bien la vôtre :
+
+```bash
+git remote -v
+```
+
+4. À chaque étape marquante d’un TP, enregistrez votre travail :
+
+```bash
+git add -A
+git commit -m "TP03 - déploiement de l'application"
+git push
+```
+
+Votre identifiant GitHub est aussi le propriétaire de vos images : au TP01 vous publierez dans `ghcr.io/VOTRE-IDENTIFIANT/kubernetes-orchestration`, et au TP03 vous remplacerez le champ `image:` du Deployment par cette adresse.
+
+Pour récupérer une correction apportée au dépôt d’origine pendant la formation :
+
+```bash
+git remote add upstream https://github.com/oboyo-training/kubernetes-orchestration.git
+git fetch upstream
+git merge upstream/main
+```
+
+Facultatif : dans l’onglet Actions de votre fork, GitHub désactive les workflows par défaut. Si vous les activez, chaque push lancera les tests et la construction de l’image sur votre propre dépôt.
+
+## Démarrer le cluster
+
+Le TP02 vous guide dans la création du cluster. Depuis la racine du dépôt, la commande est :
 
 ```bash
 kind create cluster --config kind/cluster.yaml --wait 120s
 kubectl get nodes -o wide
 ```
 
-Suivre les TP dans l’ordre. Le TP03 déploie Namespace, ConfigMap, Deployment et Service, puis teste le Service avec :
+Les trois nœuds doivent être `Ready`.
 
-```bash
-kubectl -n kube-training rollout status deployment/flask-app
-kubectl -n kube-training get pods,svc,endpoints
-kubectl -n kube-training port-forward svc/flask-app 8080:80
-```
-
-Dans un autre terminal : `curl -i http://localhost:8080/health`.
-
-Le TP06 expose ensuite l’application via Gateway API et NGINX Gateway Fabric. Le guide formateur est dans [docs/installation-gateway.md](docs/installation-gateway.md).
-
-## Structure
+## Organisation du dépôt
 
 ```text
 app/                         application Flask
-tests/                       tests automatisés
-kind/cluster.yaml            cluster Kind et port mapping hôte 80 → NodePort 30080
-manifests/                   Namespace, ConfigMap, Deployment, Service, Gateway, HTTPRoute
-docs/parcours-pedagogique.md parcours formateur sur 14 h
-docs/installation-gateway.md guide formateur Gateway API / NGINX Gateway Fabric
-tp/                          six énoncés apprenants
-bonus/fluxcd/                 bonus GitOps
-bonus/vault-eso/              bonus Vault + External Secrets Operator
-.github/workflows/            CI et publication GHCR
+tests/                       tests de l’application
+pytest.ini                   configuration des tests
+kind/cluster.yaml            configuration du cluster Kind
+manifests/                   manifestes utilisés pendant les TP
+tp/                          énoncés des six TP
+docs/installation-gateway.md     guide d’installation pour le TP06
+docs/parcours-pedagogique.md      progression des deux journées
+.github/workflows/            tests et publication de l’image GHCR
+bonus/                        exercices complémentaires
 ```
 
-## Limites et sécurité
+## Sécurité
 
-- Kind est un laboratoire, pas un cluster de production.
-- Un Secret Kubernetes standard est encodé en base64 ; ce n’est pas automatiquement du chiffrement.
-- Le token GHCR ne doit jamais être commité, inclus dans les slides ou montré dans une capture.
-- Le secret applicatif de démonstration ne doit contenir aucune donnée réelle.
-- L’application affiche seulement si `API_KEY` est configurée, jamais sa valeur.
-- Les NetworkPolicies dépendent du CNI et ne sont pas appliquées dans ce laboratoire par défaut.
-- Le parcours utilise Gateway API et NGINX Gateway Fabric, pas l’ancien contrôleur `ingress-nginx`.
+- Ne mettez jamais de token GitHub ou de secret réel dans un fichier du dépôt.
+- Au TP01, utilisez un token GHCR autorisé à publier une image.
+- Au TP03, utilisez un token autorisé à lire le package privé (`read:packages`).
+- Un Secret Kubernetes standard n’est pas automatiquement chiffré.
+- Kind est un environnement de lab, pas un cluster de production.
 
-## Nettoyage
+## Nettoyer le cluster
+
+À la fin de la formation, supprimez le cluster si vous n’en avez plus besoin :
 
 ```bash
 kind delete cluster --name kube-training
 ```
+
+## TP bonus (facultatifs)
+
+Après les six TP principaux, vous pouvez poursuivre avec :
+
+- [Bonus — Déployer une application avec Flux](bonus/fluxcd/README.md)
+- [Bonus — Utiliser Vault avec External Secrets Operator](bonus/vault-eso/README.md)
+
+## Documentation officielle
+
+- [Kubernetes](https://kubernetes.io/docs/home/)
+- [kubectl — Référence rapide](https://kubernetes.io/docs/reference/kubectl/quick-reference/)
+- [Kind](https://kind.sigs.k8s.io/)
+- [Gateway API](https://gateway-api.sigs.k8s.io/)
+- [NGINX Gateway Fabric](https://docs.nginx.com/nginx-gateway-fabric/)
+- [Flux](https://fluxcd.io/flux/)
+- [External Secrets Operator](https://external-secrets.io/)
+- [HashiCorp Vault](https://developer.hashicorp.com/vault/docs)
