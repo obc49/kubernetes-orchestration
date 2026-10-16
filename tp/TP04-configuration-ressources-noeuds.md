@@ -196,7 +196,7 @@ kubectl -n kube-training exec deployment/flask-app -- sh -c 'ls -l /tmp/formatio
 
 Le nouveau Pod possède un nouveau volume `emptyDir` : l’ancien fichier n’est plus là.
 
-## Partie F — Mettre à jour l’application et revenir en arrière (environ 15 minutes)
+## Partie F — Mettre à jour l’application et revenir en arrière
 
 Cette partie vous montre comment publier une nouvelle version, effectuer un rolling update et revenir à la version précédente.
 
@@ -217,13 +217,14 @@ Nous modifions le titre et non le message, car `APP_MESSAGE` est fourni par le C
 2. Construisez et publiez une nouvelle image. Utilisez le même compte GHCR que dans le TP01. Le token du TP03 porte `read:packages` et ne suffit pas pour publier ; utilisez celui du TP01, avec `write:packages` :
 
 ```bash
-export OWNER="votre-identifiant-github"
-export IMAGE="ghcr.io/$OWNER/kubernetes-orchestration"
 read -p "Identifiant GitHub : " GHCR_USER
 read -s -p "Token GHCR avec write:packages : " GHCR_TOKEN
 echo
 printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
 unset GHCR_TOKEN
+
+export OWNER="$GHCR_USER"
+export IMAGE="ghcr.io/$OWNER/kubernetes-orchestration"
 
 docker build -t "$IMAGE:tp04-2" .
 docker push "$IMAGE:tp04-2"
