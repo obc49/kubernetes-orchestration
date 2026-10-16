@@ -2,7 +2,7 @@
 
 ## Objectif
 
-Installer le contrôleur NGINX Gateway Fabric, créer une Gateway et une HTTPRoute, puis accéder à l’application depuis votre navigateur ou avec `curl`.
+Installer le contrôleur NGINX Gateway Fabric, créer une Gateway et une HTTPRoute, puis accéder à l’application avec `curl`, et en option depuis votre navigateur.
 
 ## Prérequis
 
@@ -36,10 +36,10 @@ kubectl -n kube-training get gateway,httproute
 Vérifiez les détails :
 
 ```bash
+kubectl -n kube-training wait --for=condition=Programmed gateway/flask-gateway --timeout=120s
 kubectl -n kube-training describe gateway flask-gateway
 kubectl -n kube-training describe httproute flask-route
 kubectl -n kube-training get svc flask-gateway-nginx
-kubectl -n kube-training wait --for=condition=Programmed gateway/flask-gateway --timeout=120s
 ```
 
 La Gateway définit le point d’entrée HTTP. La HTTPRoute indique vers quel Service envoyer les requêtes. Le contrôleur crée le Service de données `flask-gateway-nginx` dans le namespace `kube-training` lorsque la Gateway est prise en charge.
@@ -70,7 +70,15 @@ La HTTPRoute ne répond que pour le nom d’hôte `flask.local`. Vérifiez le ca
 curl -i http://127.0.0.1:8080/
 ```
 
-Sans l’en-tête `Host: flask.local`, la requête ne correspond pas à la route et doit retourner `404`. Il n’est pas nécessaire de modifier le fichier hosts.
+Sans l’en-tête `Host: flask.local`, la requête ne correspond pas à la route et doit retourner `404`. Avec `curl`, il n’est pas nécessaire de modifier le fichier hosts : l’en-tête `Host` suffit.
+
+Facultatif, pour tester depuis un navigateur : ajoutez la ligne suivante dans le fichier hosts (`/etc/hosts` sous Linux/WSL, ou `C:\Windows\System32\drivers\etc\hosts` sous Windows) :
+
+```text
+127.0.0.1 flask.local
+```
+
+Puis ouvrez `http://flask.local:8080/`. Sans cette ligne, le navigateur ne peut pas envoyer le nom d’hôte attendu par la HTTPRoute.
 
 ## 4. Si cela ne fonctionne pas
 
@@ -92,11 +100,11 @@ kubectl -n kube-training describe httproute flask-route
 - Le Service `flask-gateway-nginx` doit exister dans le namespace `kube-training`.
 - Le `port-forward` doit être actif dans le premier terminal.
 
-Si le test externe échoue, vérifiez d’abord l’application seule :
+Si le test externe échoue, vérifiez d’abord l’application seule. Arrêtez le `port-forward` du premier terminal avec `Ctrl+C`, ou utilisez un autre port local, par exemple 8081.
 
 ```bash
-kubectl -n kube-training port-forward svc/flask-app 8080:80
-curl -i http://localhost:8080/health
+kubectl -n kube-training port-forward svc/flask-app 8081:80
+curl -i http://localhost:8081/health
 ```
 
 Arrêtez le `port-forward` avec `Ctrl+C`. Cette vérification permet de distinguer un problème applicatif d’un problème de routage.
@@ -107,7 +115,7 @@ Arrêtez le `port-forward` avec `Ctrl+C`. Cette vérification permet de distingu
 - Gateway définit le point d’entrée et son listener.
 - HTTPRoute décrit les règles de routage vers un Service.
 - Le Service applicatif reste un Service ClusterIP.
-- Le montage Kind + NodePort sert au laboratoire ; il ne remplace pas un LoadBalancer de production.
+- Le Service de données est de type NodePort, ce qui serait le point d’entrée sur un vrai cluster ; en laboratoire nous l’atteignons par `port-forward` pour ne dépendre d’aucun port fixe du poste.
 
 ## Questions
 
