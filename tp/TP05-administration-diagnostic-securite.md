@@ -163,7 +163,7 @@ Pour diagnostiquer, vérifiez l’état, les événements, la description de la 
 
 ## Questions
 
-1. Pourquoi un Pod peut-il être Ready alors que le Service n’a aucun endpoint ?
+1. Au TP02, pourquoi le Service n’avait-il plus d’endpoints alors que les Pods étaient Ready ?
 2. Pourquoi un Service qui a des endpoints peut-il quand même ne pas répondre ?
 3. Quelle différence entre `get`, `describe`, `logs` et `exec` ?
 4. À quoi servent Role et RoleBinding ?
