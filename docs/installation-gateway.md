@@ -90,7 +90,7 @@ kubectl -n nginx-gateway get deployments
 kubectl -n nginx-gateway logs deployment/$(kubectl -n nginx-gateway get deployments -o jsonpath='{.items[0].metadata.name}')
 ```
 
-La deuxième commande récupère automatiquement le nom du Deployment et affiche ses logs.
+La dernière commande récupère automatiquement le nom du Deployment et affiche ses logs.
 
 Si le NodePort 30080 n’apparaît pas, vérifiez les valeurs du chart installé et la documentation de la version 2.7.2 avant de poursuivre.
 
