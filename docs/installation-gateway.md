@@ -92,7 +92,7 @@ kubectl -n nginx-gateway logs deployment/$(kubectl -n nginx-gateway get deployme
 
 La dernière commande récupère automatiquement le nom du Deployment et affiche ses logs.
 
-Si le NodePort 30080 n’apparaît pas, vérifiez les valeurs du chart installé et la documentation de la version 2.7.2 avant de poursuivre.
+Le NodePort 30080 n’est pas utilisé par les TP : l’accès HTTP se fait en port-forward. S’il n’apparait pas, vous pouvez poursuivre.
 
 ## Version et limites du lab
 
