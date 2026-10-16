@@ -19,7 +19,6 @@ Vault conserve la valeur source. ESO la lit et crée un Secret Kubernetes. L’a
 - Les TP principaux sont terminés.
 - Le cluster Kind fonctionne.
 - Helm 3 et kubectl sont installés.
-- Le client Vault est installé sur votre poste : [instructions d’installation officielles](https://developer.hashicorp.com/vault/install).
 - Vous avez accès à Internet.
 - Vous travaillez uniquement avec des valeurs de démonstration.
 
