@@ -78,7 +78,7 @@ Facultatif, pour tester depuis un navigateur : ajoutez la ligne suivante dans le
 127.0.0.1 flask.local
 ```
 
-Puis ouvrez `http://flask.local:8080/`. Sans cette ligne, le navigateur ne peut pas envoyer le nom d’hôte attendu par la HTTPRoute.
+Puis ouvrez `http://flask.local:8080/`, ou le port local que vous avez choisi. Sans cette ligne, le navigateur ne peut pas envoyer le nom d’hôte attendu par la HTTPRoute.
 
 ## 4. Si cela ne fonctionne pas
 
