@@ -10,7 +10,7 @@ Formation de deux jours, soit 14 heures. Le parcours suit une progression simple
 | Architecture | Control plane, API Server, etcd, scheduler, controller manager, kubelet, nœuds et Pods | Démonstrations |
 | Application et conteneurs | Application Flask, Dockerfile, image, conteneur, endpoints | TP01 |
 | Registre d’images | GHCR, tags, publication d’une image | TP01 |
-| Installation | Kind, kubectl et création du cluster au début du TP02 | TP02 |
+| Installation | Options d’installation (Minikube, kubeadm, Kind), kubectl et création du cluster au début du TP02 | TP02 |
 | Premiers objets Kubernetes | Namespace, Pod, labels, selectors, Service, port-forward | TP02 |
 | Déploiement de l’application | Deployment, ReplicaSet, Service, image privée et imagePullSecret | TP03 |
 
