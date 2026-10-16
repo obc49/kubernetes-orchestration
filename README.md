@@ -41,6 +41,44 @@ python3 --version
 
 Docker doit pouvoir démarrer des conteneurs. Si `docker version` affiche une erreur de connexion au daemon, corrigez Docker avant de commencer.
 
+## Votre copie du dépôt
+
+Chaque participant travaille dans sa propre copie du dépôt. Vous pourrez ainsi modifier les manifestes, publier votre image et conserver votre travail après la formation.
+
+1. Ouvrez https://github.com/oboyo-training/kubernetes-orchestration et cliquez sur **Fork**, en haut à droite. Conservez le nom proposé.
+2. Clonez votre fork, et non le dépôt d’origine :
+
+```bash
+git clone https://github.com/VOTRE-IDENTIFIANT/kubernetes-orchestration.git
+cd kubernetes-orchestration
+```
+
+3. Vérifiez que l’origine est bien la vôtre :
+
+```bash
+git remote -v
+```
+
+4. À chaque étape marquante d’un TP, enregistrez votre travail :
+
+```bash
+git add -A
+git commit -m "TP03 - déploiement de l'application"
+git push
+```
+
+Votre identifiant GitHub est aussi le propriétaire de vos images : au TP01 vous publierez dans `ghcr.io/VOTRE-IDENTIFIANT/kubernetes-orchestration`, et au TP03 vous remplacerez le champ `image:` du Deployment par cette adresse.
+
+Pour récupérer une correction apportée au dépôt d’origine pendant la formation :
+
+```bash
+git remote add upstream https://github.com/oboyo-training/kubernetes-orchestration.git
+git fetch upstream
+git merge upstream/main
+```
+
+Facultatif : dans l’onglet Actions de votre fork, GitHub désactive les workflows par défaut. Si vous les activez, chaque push lancera les tests et la construction de l’image sur votre propre dépôt.
+
 ## Démarrer le cluster
 
 Le TP02 vous guide dans la création du cluster. Depuis la racine du dépôt, la commande est :
@@ -57,6 +95,7 @@ Les trois nœuds doivent être `Ready`.
 ```text
 app/                         application Flask
 tests/                       tests de l’application
+pytest.ini                   configuration des tests
 kind/cluster.yaml            configuration du cluster Kind
 manifests/                   manifestes utilisés pendant les TP
 tp/                          énoncés des six TP
