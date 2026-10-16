@@ -115,7 +115,7 @@ Résultat attendu : la première commande répond `yes`, la seconde `no`. Le com
 
 ## Partie D — Comprendre les limites de la sécurité réseau
 
-Une NetworkPolicy peut limiter les flux entre Pods, mais son effet dépend du plugin réseau (CNI) qui équipe le cluster. Dans ce laboratoire, ne concluez pas qu’un flux est bloqué simplement parce qu’un manifeste NetworkPolicy est accepté par l’API.
+Une NetworkPolicy peut limiter les flux entre Pods, mais son effet dépend du plugin réseau (CNI) qui équipe le cluster. Dans ce lab, ne concluez pas qu’un flux est bloqué simplement parce qu’un manifeste NetworkPolicy est accepté par l’API.
 
 Répondez à ces questions :
 - Quel risque réduit une NetworkPolicy ?
@@ -135,9 +135,9 @@ kubectl get events -A --field-selector type=Warning
 
 Remplacez `<nom-du-worker>` par le nom d’un nœud. Dans la sortie de `describe node`, repérez la section `Conditions` et les événements. Les conditions indiquent si le nœud est prêt et si certains problèmes sont détectés.
 
-**Node Problem Detector** est un composant qui surveille le nœud lui-même, par exemple le noyau, le disque ou le runtime des conteneurs. Il remonte les problèmes détectés sous forme de conditions et d’événements Kubernetes. Il n’est pas installé dans ce laboratoire.
+**Node Problem Detector** est un composant qui surveille le nœud lui-même, par exemple le noyau, le disque ou le runtime des conteneurs. Il remonte les problèmes détectés sous forme de conditions et d’événements Kubernetes. Il n’est pas installé dans ce lab.
 
-**Google Cloud Operations** (anciennement Stackdriver) est un exemple d’outillage de supervision proposé par un fournisseur cloud. Il peut centraliser les journaux, les métriques et les alertes d’un environnement cloud. Il n’est pas installé dans ce laboratoire.
+**Google Cloud Operations** (anciennement Stackdriver) est un exemple d’outillage de supervision proposé par un fournisseur cloud. Il peut centraliser les journaux, les métriques et les alertes d’un environnement cloud. Il n’est pas installé dans ce lab.
 
 Distinguez ces quatre notions :
 
