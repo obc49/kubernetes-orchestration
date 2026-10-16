@@ -22,7 +22,7 @@ Formation de deux jours, soit 14 heures. Le parcours suit une progression simple
 | Ressources et placement | Requests, limits CPU/mémoire, nodeSelector et événements de scheduling | TP04 |
 | Stockage | Volume emptyDir, durée de vie des données, introduction au PVC et au stockage persistant | TP04 |
 | Administration | get, describe, logs, exec, events, états des Pods et méthode de diagnostic | TP05 |
-| Sécurité | RBAC, ServiceAccount, moindre privilège, Secrets, NetworkPolicy et limites du laboratoire | TP05 |
+| Sécurité | RBAC, ServiceAccount, moindre privilège, Secrets, NetworkPolicy et limites du lab | TP05 |
 | Supervision | Logs, événements, métriques, détection de problèmes de nœud et solutions de supervision cloud | TP05 |
 | Exposition HTTP | Gateway API, GatewayClass, Gateway, HTTPRoute et NGINX Gateway Fabric | TP06 |
 | Synthèse | Vérification du fonctionnement, diagnostic et restitution | TP03 à TP06 |
@@ -32,7 +32,7 @@ Formation de deux jours, soit 14 heures. Le parcours suit une progression simple
 À la fin de la formation, vous serez capable de :
 
 - expliquer le rôle de Kubernetes et les principaux composants d’un cluster ;
-- créer et inspecter un cluster de laboratoire avec Kind et kubectl ;
+- créer et inspecter un cluster de lab avec Kind et kubectl ;
 - construire et publier une image de conteneur ;
 - créer un Pod, un Service, un namespace, des labels et des selectors ;
 - déployer une application avec Deployment et comprendre le rôle du ReplicaSet ;
