@@ -8,7 +8,7 @@ Ce TP se fait entièrement sur votre poste, avec Docker. Le cluster Kubernetes e
 
 ## 1. Découvrir l’application
 
-Depuis la racine de votre copie du dépôt :
+Depuis la racine du dépôt :
 
 ```bash
 ls
