@@ -21,7 +21,6 @@ apply:
 	kubectl apply -f manifests/10-configmap.yaml
 	kubectl apply -f manifests/20-deployment.yaml
 	kubectl apply -f manifests/30-service.yaml
-	kubectl -n kube-training rollout status deployment/flask-app
 
 gateway:
 	kubectl apply -f manifests/40-gateway.yaml
