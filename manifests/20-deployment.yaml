@@ -18,7 +18,7 @@ spec:
       containers:
         - name: flask-app
           # Au TP03, remplacez cette image par celle publiée au TP01.
-          image: ghcr.io/oboyo-training/kubernetes-orchestration:remplacer-au-tp01
+          image: ghcr.io/VOTRE-IDENTIFIANT/kubernetes-orchestration:remplacer-au-tp01
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
