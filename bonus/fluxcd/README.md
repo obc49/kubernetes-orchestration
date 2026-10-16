@@ -255,7 +255,7 @@ Confirmez la suppression des ressources de l’application :
 kubectl get deployment,svc -l app=demo
 ```
 
-Pour supprimer entièrement Flux, le cluster de laboratoire et le dépôt, suivez les procédures officielles. Ne supprimez pas le cluster si vous souhaitez conserver les TP principaux.
+Pour supprimer entièrement Flux, le cluster de lab et le dépôt, suivez les procédures officielles. Ne supprimez pas le cluster si vous souhaitez conserver les TP principaux.
 
 ## À retenir
 
