@@ -19,13 +19,13 @@ L’environnement recommandé pour la formation est **Ubuntu sous WSL2 avec Dock
 
 Installez et vérifiez les outils suivants avant de commencer :
 
-- Git
-- Docker
+- [Git — installation](https://git-scm.com/downloads)
+- [Docker — installation](https://docs.docker.com/get-started/get-docker/)
 - [kubectl — installation](https://kubernetes.io/docs/tasks/tools/#kubectl)
 - [Kind — installation](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
 - [Helm 3 — installation](https://helm.sh/docs/intro/install/) (utilisé au TP06)
-- curl
-- Python 3.11 ou plus récent (TP01)
+- [curl — téléchargement](https://curl.se/download.html)
+- [Python 3.11 ou plus récent — téléchargement](https://www.python.org/downloads/) (TP01)
 
 Vérifiez que les commandes suivantes fonctionnent :
 
