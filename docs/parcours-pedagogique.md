@@ -4,8 +4,8 @@ Formation de deux jours, soit 14 heures. Le parcours suit une progression simple
 
 ## Jour 1 — Découvrir Kubernetes et déployer une application
 
-| Séquence | Contenu | TP | Durée indicative | Durée indicative |
-|---|---|---|---|---|
+| Séquence | Contenu | TP | Durée indicative |
+|---|---|---|---|
 | Introduction | Pourquoi Kubernetes, modèle déclaratif, état souhaité | Démonstrations | |
 | Architecture | Control plane, API Server, etcd, scheduler, controller manager, kubelet, nœuds et Pods | Démonstrations | |
 | Application et conteneurs | Application Flask, Dockerfile, image, conteneur, endpoints | TP01 | 1 h 30 |
@@ -16,8 +16,8 @@ Formation de deux jours, soit 14 heures. Le parcours suit une progression simple
 
 ## Jour 2 — Configurer, administrer et exposer l’application
 
-| Séquence | Contenu | TP |
-|---|---|---|
+| Séquence | Contenu | TP | Durée indicative |
+|---|---|---|---|
 | Configuration | ConfigMap et Secret | TP04 | 1 h |
 | Ressources et placement | Requests, limits CPU/mémoire, nodeSelector et événements de scheduling | TP04 | 1 h |
 | Stockage | Volume emptyDir, durée de vie des données, introduction au PVC et au stockage persistant | TP04 | 1 h |
