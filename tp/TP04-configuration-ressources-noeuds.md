@@ -200,13 +200,31 @@ Le nouveau Pod possède un nouveau volume `emptyDir` : l’ancien fichier n’es
 
 Cette partie vous montre comment publier une nouvelle version, effectuer un rolling update et revenir à la version précédente.
 
-1. Dans `app/app.py`, modifiez le message par défaut retourné par la page d’accueil. Par exemple, remplacez `Application Flask opérationnelle.` par `Version TP04-2 : application mise à jour.`
+1. Dans `app/app.py`, ligne 28, remplacez le titre HTML :
 
-2. Construisez et publiez une nouvelle image. Utilisez le même compte GHCR que dans le TP01 :
+```html
+<title>Kubernetes Orchestration - Flask</title>
+```
+
+par :
+
+```html
+<title>Kubernetes Orchestration - Flask TP04-2</title>
+```
+
+Nous modifions le titre et non le message, car `APP_MESSAGE` est fourni par le ConfigMap et remplacerait toute valeur écrite dans le code.
+
+2. Construisez et publiez une nouvelle image. Utilisez le même compte GHCR que dans le TP01. Le token du TP03 porte `read:packages` et ne suffit pas pour publier ; utilisez celui du TP01, avec `write:packages` :
 
 ```bash
 export OWNER="votre-identifiant-github"
 export IMAGE="ghcr.io/$OWNER/kubernetes-orchestration"
+read -p "Identifiant GitHub : " GHCR_USER
+read -s -p "Token GHCR avec write:packages : " GHCR_TOKEN
+echo
+printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+unset GHCR_TOKEN
+
 docker build -t "$IMAGE:tp04-2" .
 docker push "$IMAGE:tp04-2"
 ```
@@ -245,10 +263,17 @@ kubectl -n kube-training port-forward svc/flask-app 8080:80
 Dans un autre terminal :
 
 ```bash
-curl -i http://127.0.0.1:8080/
+curl -s http://127.0.0.1:8080/ | grep '<title>'
 ```
 
-Arrêtez le `port-forward` avec `Ctrl+C`. Le titre HTML précédent doit être revenu. Pour le vérifier, cherchez la balise `<title>` dans la réponse de `curl`.  Si le port 8080 est déjà utilisé, choisissez un autre port local libre.
+Avant le `rollout undo`, le titre contient `TP04-2`. Après le `rollout undo`, il ne le contient plus. Arrêtez le `port-forward` avec `Ctrl+C`. Si le port 8080 est déjà utilisé, choisissez un autre port local libre.
+
+Nettoyez la session GHCR :
+
+```bash
+docker logout ghcr.io
+unset OWNER IMAGE GHCR_USER
+```
 
 ## À retenir
 
@@ -267,6 +292,8 @@ Arrêtez le `port-forward` avec `Ctrl+C`. Le titre HTML précédent doit être r
 3. Pourquoi le Pod reste-t-il Pending quand aucun nœud ne porte le label demandé ?
 4. À quel moment les données d’un `emptyDir` sont-elles perdues ?
 5. Quelle différence entre `emptyDir` et un stockage persistant demandé via PVC ?
+6. Que se passe-t-il pendant un rolling update ?
+7. Que fait exactement la commande `kubectl rollout undo` ?
 
 
 ---
