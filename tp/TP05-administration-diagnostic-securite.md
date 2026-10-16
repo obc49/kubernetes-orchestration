@@ -18,7 +18,7 @@ Utiliser les commandes de base pour trouver la cause d’un problème, corriger 
 kubectl -n kube-training get deployment,pods,svc,endpoints
 ```
 
-2. Ouvrez `manifests/30-service.yaml`. Dans une copie nommée `/tmp/service-tp05.yaml`, remplacez temporairement le selector `app.kubernetes.io/name: flask-app` par `app.kubernetes.io/name: mauvaise-valeur`.
+2. Ouvrez `manifests/30-service.yaml`. Dans une copie nommée `/tmp/service-tp05.yaml`, remplacez temporairement `targetPort: http` par `targetPort: 8080`.
 
 3. Appliquez la copie de test :
 
@@ -27,7 +27,15 @@ kubectl apply -f /tmp/service-tp05.yaml
 kubectl -n kube-training get svc,endpoints
 ```
 
-Le Service n’a plus d’endpoints car son selector ne correspond à aucun Pod. Retrouvez les labels des Pods et le selector du Service :
+Cette fois, le Service a toujours des endpoints et les Pods sont `Ready`, mais la connexion échoue : le Service envoie le trafic vers le port 8080 du Pod, alors que l’application écoute sur le port 5000. Comparez avec le TP02 : là-bas, les endpoints étaient vides parce que le selector ne correspondait à aucun Pod.
+
+```bash
+kubectl -n kube-training get endpoints flask-app
+kubectl -n kube-training port-forward svc/flask-app 8080:80
+curl -i http://127.0.0.1:8080/health
+```
+
+Le test HTTP échoue malgré la présence d’endpoints. Arrêtez le `port-forward` avec `Ctrl+C`. Pour comprendre le routage, retrouvez les labels des Pods et la configuration du Service :
 
 ```bash
 kubectl -n kube-training get pods --show-labels
@@ -156,12 +164,13 @@ Pour diagnostiquer, vérifiez l’état, les événements, la description de la 
 ## Questions
 
 1. Pourquoi un Pod peut-il être Ready alors que le Service n’a aucun endpoint ?
-2. Quelle différence entre `get`, `describe`, `logs` et `exec` ?
-3. À quoi servent Role et RoleBinding ?
-4. Pourquoi la commande `kubectl auth can-i` est-elle utile ?
-5. Pourquoi faut-il tester l’effet d’une NetworkPolicy sur un CNI qui la prend en charge ?
-6. Quelle différence entre logs, événements, métriques et alertes ?
-7. Quel type de problème Node Problem Detector peut-il signaler ?
+2. Pourquoi un Service qui a des endpoints peut-il quand même ne pas répondre ?
+3. Quelle différence entre `get`, `describe`, `logs` et `exec` ?
+4. À quoi servent Role et RoleBinding ?
+5. Pourquoi la commande `kubectl auth can-i` est-elle utile ?
+6. Pourquoi faut-il tester l’effet d’une NetworkPolicy sur un CNI qui la prend en charge ?
+7. Quelle différence entre logs, événements, métriques et alertes ?
+8. Quel type de problème Node Problem Detector peut-il signaler ?
 
 
 ---
