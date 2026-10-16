@@ -14,7 +14,7 @@ Les trois nœuds doivent être `Ready`. Aucun port fixe de votre poste n’est r
 
 ## 2. Installer les ressources Gateway API
 
-Nous utilisons NGINX Gateway Fabric 2.7.2 pour ce laboratoire. Installez les CRD Gateway API standard correspondant à cette version :
+Nous utilisons NGINX Gateway Fabric 2.7.2 pour ce lab. Installez les CRD Gateway API standard correspondant à cette version :
 
 ```bash
 kubectl kustomize "https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.7.2" | kubectl apply -f -
@@ -70,7 +70,7 @@ Service flask-gateway-nginx (namespace kube-training)
 Gateway -> HTTPRoute -> Service flask-app:80 -> Pods Flask:5000
 ```
 
-Le Service de données est créé dans le namespace de la Gateway, ici `kube-training`, lorsque la Gateway est attachée à la GatewayClass. Son nom est `flask-gateway-nginx`. Le Service est de type NodePort, qui serait un point d’entrée sur un vrai cluster. Dans ce laboratoire, utilisez `port-forward` pour ne dépendre d’aucun port fixe de votre poste.
+Le Service de données est créé dans le namespace de la Gateway, ici `kube-training`, lorsque la Gateway est attachée à la GatewayClass. Son nom est `flask-gateway-nginx`. Le Service est de type NodePort, qui serait un point d’entrée sur un vrai cluster. Dans ce lab, utilisez `port-forward` pour ne dépendre d’aucun port fixe de votre poste.
 
 Après avoir créé la Gateway au TP06, vérifiez-le avec :
 
@@ -94,8 +94,8 @@ La dernière commande récupère automatiquement le nom du Deployment et affiche
 
 Si le NodePort 30080 n’apparaît pas, vérifiez les valeurs du chart installé et la documentation de la version 2.7.2 avant de poursuivre.
 
-## Version et limites du laboratoire
+## Version et limites du lab
 
 Ce TP utilise les versions épinglées de Gateway API et NGINX Gateway Fabric indiquées ci-dessus. Si vous changez de version, vérifiez la compatibilité des CRD et des valeurs Helm.
 
-Kind et NodePort servent à comprendre le routage HTTP dans un laboratoire. Ce montage n’est pas un LoadBalancer cloud et ne configure ni IP publique, ni TLS de production, ni haute disponibilité.
+Kind et NodePort servent à comprendre le routage HTTP dans un lab. Ce montage n’est pas un LoadBalancer cloud et ne configure ni IP publique, ni TLS de production, ni haute disponibilité.
