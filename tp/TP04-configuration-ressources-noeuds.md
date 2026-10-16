@@ -247,6 +247,20 @@ kubectl -n kube-training rollout history deployment/flask-app
 
 Vous devez voir l’ancien ReplicaSet et le nouveau. Kubernetes remplace progressivement les Pods selon la stratégie de mise à jour du Deployment.
 
+Vérifiez le nouveau titre avant le rollback :
+
+```bash
+kubectl -n kube-training port-forward svc/flask-app 8080:80
+```
+
+Dans un autre terminal :
+
+```bash
+curl -s http://127.0.0.1:8080/ | grep '<title>'
+```
+
+Le titre doit contenir `TP04-2`. Arrêtez le `port-forward` avec `Ctrl+C` avant de poursuivre.
+
 5. Revenez à la version précédente :
 
 ```bash
@@ -254,7 +268,7 @@ kubectl -n kube-training rollout undo deployment/flask-app
 kubectl -n kube-training rollout status deployment/flask-app
 ```
 
-6. Vérifiez le message précédent avec un `port-forward` :
+6. Vérifiez le titre après le rollback avec un `port-forward` :
 
 ```bash
 kubectl -n kube-training port-forward svc/flask-app 8080:80
