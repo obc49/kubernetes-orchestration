@@ -19,6 +19,7 @@ Vault conserve la valeur source. ESO la lit et crée un Secret Kubernetes. L’a
 - Les TP principaux sont terminés.
 - Le cluster Kind fonctionne.
 - Helm 3 et kubectl sont installés.
+- Le client Vault est installé sur votre poste : [instructions d’installation officielles](https://developer.hashicorp.com/vault/install).
 - Vous avez accès à Internet.
 - Vous travaillez uniquement avec des valeurs de démonstration.
 
@@ -29,7 +30,7 @@ kubectl get nodes
 helm version
 ```
 
-## 1. Installer Vault dans le cluster de laboratoire
+## 1. Installer Vault dans le cluster de lab
 
 Cette configuration est réservée à la formation : Vault démarre en mode développement, sans stockage durable ni sécurité adaptée à la production. N’y placez aucun secret réel.
 
@@ -107,9 +108,9 @@ kubectl get crd | grep external-secrets
 
 ## 4. Préparer l’accès de ESO à Vault
 
-Pour ce laboratoire uniquement, nous allons utiliser le token de développement de Vault. Cette méthode simplifie la démonstration, mais **ne doit pas être utilisée en production**. En production, choisissez une méthode d’authentification adaptée et des permissions minimales.
+Pour ce lab uniquement, nous allons utiliser le token de développement de Vault. Cette méthode simplifie la démonstration, mais **ne doit pas être utilisée en production**. En production, choisissez une méthode d’authentification adaptée et des permissions minimales.
 
-Récupérez le token depuis la configuration du Pod Vault uniquement pour le laboratoire :
+Récupérez le token depuis la configuration du Pod Vault uniquement pour le lab :
 
 ```bash
 kubectl -n vault exec vault-0 -- printenv VAULT_DEV_ROOT_TOKEN_ID
@@ -130,7 +131,7 @@ kubectl -n kube-training create secret generic vault-token \
 unset VAULT_TOKEN
 ```
 
-Le token reste une donnée sensible même dans un laboratoire. Ne l’affichez pas et ne le commitez pas.
+Le token reste une donnée sensible même dans un lab. Ne l’affichez pas et ne le commitez pas.
 
 ## 5. Créer un SecretStore
 
@@ -251,7 +252,7 @@ kubectl -n kube-training delete secret vault-token --ignore-not-found
 rm -f /tmp/flask-api-key-test.yaml /tmp/vault-externalsecret.yaml /tmp/vault-secretstore.yaml
 ```
 
-Pour supprimer les installations de laboratoire :
+Pour supprimer les installations de lab :
 
 ```bash
 helm uninstall external-secrets -n external-secrets
