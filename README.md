@@ -21,9 +21,9 @@ Installez et vérifiez les outils suivants avant de commencer :
 
 - Git
 - Docker
-- kubectl
-- Kind
-- Helm 3 (utilisé au TP06)
+- [kubectl — installation](https://kubernetes.io/docs/tasks/tools/#kubectl)
+- [Kind — installation](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
+- [Helm 3 — installation](https://helm.sh/docs/intro/install/) (utilisé au TP06)
 - curl
 - Python 3.11 ou plus récent (TP01)
 
@@ -110,7 +110,7 @@ bonus/                        exercices complémentaires
 - Au TP01, utilisez un token GHCR autorisé à publier une image.
 - Au TP03, utilisez un token autorisé à lire le package privé (`read:packages`).
 - Un Secret Kubernetes standard n’est pas automatiquement chiffré.
-- Kind est un environnement de laboratoire, pas un cluster de production.
+- Kind est un environnement de lab, pas un cluster de production.
 
 ## Nettoyer le cluster
 
