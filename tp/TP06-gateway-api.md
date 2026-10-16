@@ -115,7 +115,7 @@ Arrêtez le `port-forward` avec `Ctrl+C`. Cette vérification permet de distingu
 - Gateway définit le point d’entrée et son listener.
 - HTTPRoute décrit les règles de routage vers un Service.
 - Le Service applicatif reste un Service ClusterIP.
-- Le Service de données est de type NodePort, ce qui serait le point d’entrée sur un vrai cluster ; en laboratoire nous l’atteignons par `port-forward` pour ne dépendre d’aucun port fixe du poste.
+- Le Service de données est de type NodePort, ce qui serait le point d’entrée sur un vrai cluster ; en lab nous l’atteignons par `port-forward` pour ne dépendre d’aucun port fixe du poste.
 
 ## Questions
 
