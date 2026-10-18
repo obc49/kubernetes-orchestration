@@ -92,7 +92,7 @@ kubectl -n nginx-gateway logs deployment/$(kubectl -n nginx-gateway get deployme
 
 La dernière commande récupère automatiquement le nom du Deployment et affiche ses logs.
 
-Le NodePort 30080 n’est pas utilisé par les TP : l’accès HTTP se fait en port-forward. S’il n’apparait pas, vous pouvez poursuivre.
+Le NodePort 30080 est configuré pour montrer ce que serait le point d’entrée du trafic sur un vrai cluster, mais les TP ne passent pas par lui : l’accès HTTP se fait en port-forward, ce qui évite de dépendre d’un port fixe de votre poste. S’il n’apparait pas, vous pouvez poursuivre.
 
 ## Version et limites du lab
 
