@@ -1,1 +1,1 @@
-"""Training Flask application package."""
+"""Paquet de l’application Flask de formation."""
