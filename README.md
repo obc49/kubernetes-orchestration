@@ -10,7 +10,7 @@ Ce dépôt contient l’application fil rouge, les manifestes et les six TP de l
 | [TP02](tp/TP02-premiers-pas-kubernetes.md) | Premiers pas dans Kubernetes | Vous savez créer un Pod, un namespace et un Service, puis tester avec `port-forward`. |
 | [TP03](tp/TP03-pod-deployment-service.md) | Déployer l’application | Vous avez déployé l’application et corrigé le problème d’accès à une image privée. |
 | [TP04](tp/TP04-configuration-ressources-noeuds.md) | Configuration, ressources et stockage | Vous avez modifié un ConfigMap, observé requests/limits et monté un volume `emptyDir`. |
-| [TP05](tp/TP05-administration-diagnostic-securite.md) | Diagnostic et sécurité | Vous avez diagnostiqué un Service sans endpoints et vérifié des droits RBAC. |
+| [TP05](tp/TP05-administration-diagnostic-securite.md) | Diagnostic et sécurité | Vous avez diagnostiqué un Service qui a des endpoints mais ne répond pas, et vérifié des droits RBAC. |
 | [TP06](tp/TP06-gateway-api.md) | Gateway API | Vous avez exposé l’application en HTTP depuis votre poste. |
 
 Le détail de la progression sur les deux journées se trouve dans [le parcours pédagogique](docs/parcours-pedagogique.md).
@@ -95,14 +95,14 @@ Les trois nœuds doivent être `Ready`.
 ## Organisation du dépôt
 
 ```text
-app/                         application Flask
-tests/                       tests de l’application
-pytest.ini                   configuration des tests
-kind/cluster.yaml            configuration du cluster Kind
-manifests/                   manifestes utilisés pendant les TP
-tp/                          énoncés des six TP
-docs/installation-gateway.md     guide d’installation pour le TP06
-docs/parcours-pedagogique.md      progression des deux journées
+app/                          application Flask
+tests/                        tests de l’application
+pytest.ini                    configuration des tests
+kind/cluster.yaml             configuration du cluster Kind
+manifests/                    manifestes utilisés pendant les TP
+tp/                           énoncés des six TP
+docs/installation-gateway.md  guide d’installation pour le TP06
+docs/parcours-pedagogique.md  progression des deux journées
 .github/workflows/            tests et publication de l’image GHCR
 bonus/                        exercices complémentaires
 ```
