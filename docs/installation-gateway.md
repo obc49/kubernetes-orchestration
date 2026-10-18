@@ -14,11 +14,13 @@ Les trois nœuds doivent être `Ready`. Aucun port fixe de votre poste n’est r
 
 ## 2. Installer les ressources Gateway API
 
-Nous utilisons NGINX Gateway Fabric 2.7.2 pour ce lab. Installez les CRD Gateway API standard correspondant à cette version :
+Nous utilisons NGINX Gateway Fabric 2.7.2 pour ce lab. Installez les CRD Gateway API standard correspondant à cette version, soit Gateway API v1.6.1 :
 
 ```bash
 kubectl kustomize "https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.7.2" | kubectl apply -f -
 ```
+
+Cette commande installe le canal standard de Gateway API, soit onze définitions de ressources : Gateway API est une famille de types de routes, et HTTPRoute n'en est qu'un. Les TP n'utilisent que GatewayClass, Gateway et HTTPRoute. Le canal standard ne contient que ce qui est stabilisé ; le canal expérimental existe à part.
 
 ## 3. Installer NGINX Gateway Fabric avec Helm
 
