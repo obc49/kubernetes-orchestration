@@ -60,7 +60,7 @@ Si le port 5000 est déjà utilisé, remplacez `5000:5000` par `5001:5000` et ut
 
 ## 3. Préparer l’accès à GHCR
 
-GHCR est le registre d’images de GitHub. Pour publier votre propre image, utilisez un compte GitHub autorisé à publier un package. Si vous travaillez à partir d’un fork, remplacez `OWNER` par votre identifiant GitHub.
+GHCR est le registre d’images de GitHub. Pour publier votre propre image, utilisez un compte GitHub autorisé à publier un package. Vous publierez dans votre propre espace GHCR, celui de votre fork.
 
 Créez un token avec le droit minimal nécessaire pour publier des packages (`write:packages`). Ne réutilisez pas un token professionnel et ne l’ajoutez jamais au dépôt.
 
@@ -81,12 +81,12 @@ Si la connexion échoue, vérifiez les droits du token et l’accès au package.
 Choisissez un tag unique pour votre image :
 
 ```bash
-export OWNER="votre-identifiant-github"
+export OWNER="$GHCR_USER"
 export IMAGE="ghcr.io/$OWNER/kubernetes-orchestration"
 export TAG="tp01-1"
 ```
 
-Remplacez `votre-identifiant-github` par votre identifiant GitHub. Construisez, taguez et publiez l’image :
+Construisez, taguez et publiez l’image :
 
 ```bash
 docker build -t "$IMAGE:$TAG" .
