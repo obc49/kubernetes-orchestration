@@ -2,7 +2,7 @@
 
 ## Objectif
 
-Modifier la configuration de l’application, lire ses requests/limits, tester le placement d’un Pod et monter un volume `emptyDir` dans le Deployment.
+Modifier la configuration de l'application, lire ses requests/limits, tester le placement d’un Pod, puis mettre à jour l’application et revenir à la version précédente. Le montage d’un volume emptyDir est proposé en option.
 
 ## Prérequis
 
