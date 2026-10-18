@@ -159,7 +159,11 @@ rm -f /tmp/role-tp05.yaml /tmp/service-tp05.yaml
 
 ## À retenir
 
-Pour diagnostiquer, vérifiez l’état, les événements, la description de la ressource et les logs. Formulez une hypothèse, corrigez un seul élément, puis vérifiez le résultat.
+- Pour diagnostiquer : vérifiez l’état, les événements, la description de la ressource et les logs. Formulez une hypothèse, corrigez un seul élément, puis vérifiez le résultat.
+- Un Service sans endpoints et un Service avec des endpoints qui ne répond pas sont deux pannes différentes : la première vient du selector, la seconde du port visé sur le Pod.
+- Un Role définit des droits dans un namespace ; un RoleBinding les attribue à un compte.
+- `kubectl auth can-i` répond sans qu’il soit nécessaire de tenter l’action.
+- L’effet réel d’une NetworkPolicy dépend du CNI : un manifeste accepté par l’API ne prouve pas que le flux est bloqué.
 
 ## Questions
 
