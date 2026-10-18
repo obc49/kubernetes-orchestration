@@ -56,6 +56,8 @@ docker logs flask-tp01
 docker rm -f flask-tp01
 ```
 
+Les endpoints `/health` et `/ready` ne servent pas à l'utilisateur : ils servent à Kubernetes. Vous verrez au TP03 comment le cluster s'en sert pour savoir si l'application fonctionne et si elle peut recevoir du trafic.
+
 Si le port 5000 est déjà utilisé, remplacez `5000:5000` par `5001:5000` et utilisez le port 5001 dans les URL.
 
 ## 3. Préparer l’accès à GHCR
