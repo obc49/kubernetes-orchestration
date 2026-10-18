@@ -116,6 +116,14 @@ kubectl -n kube-training describe deployment flask-app
 
 Le Deployment demande deux réplicas. Le Service `flask-app` sélectionne les Pods qui portent le label attendu.
 
+Le Deployment déclare trois sondes sur ces endpoints. La startupProbe laisse à l'application le temps de démarrer. La readinessProbe décide si le Pod reçoit du trafic : tant qu'elle échoue, le Service retire le Pod de ses endpoints. La livenessProbe redémarre le conteneur s'il ne répond plus. Observez-les :
+
+```bash
+kubectl -n kube-training get deployment flask-app -o jsonpath='{.spec.template.spec.containers[0].startupProbe}{"\n"}{.spec.template.spec.containers[0].readinessProbe}{"\n"}{.spec.template.spec.containers[0].livenessProbe}{"\n"}'
+```
+
+Le même conteneur déclare aussi un `securityContext`. Il tourne sous l'utilisateur 10001 et non en root, ne peut pas élever ses privilèges, abandonne toutes les capacités Linux et utilise le profil seccomp par défaut. Ce sont quatre réglages indépendants du code de l'application : c'est le manifeste qui les impose, pas le Dockerfile seul.
+
 ## 7. Tester l’application
 
 Dans un terminal :
@@ -153,6 +161,8 @@ Arrêtez le suivi avec `Ctrl+C`. Le Deployment maintient le nombre de réplicas 
 - Le Service fournit un point d’accès stable vers les Pods sélectionnés.
 - `imagePullSecrets` permet de télécharger une image depuis un registre privé.
 - Le Secret doit se trouver dans le même namespace que les Pods qui l’utilisent.
+- Les sondes relient l'application au cluster : la readinessProbe commande l'entrée du Pod dans les endpoints du Service, la livenessProbe commande le redémarrage du conteneur.
+- Un conteneur peut tourner sans droits root et sans capacités Linux : c'est le `securityContext` du manifeste qui l'impose.
 
 ## Questions
 
