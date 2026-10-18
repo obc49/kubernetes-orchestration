@@ -4,6 +4,12 @@
 
 Créer un namespace, lancer un Pod avec une image publique, l’identifier avec des labels, puis y accéder à travers un Service et `port-forward`. Dans ce TP, nous créons les objets un par un : pas encore de Deployment.
 
+## Prérequis
+
+- TP01 terminé.
+- Docker fonctionne sur votre poste.
+- Kind et `kubectl` sont installés et répondent.
+
 ## 1. Vérifier le cluster
 
 Si le cluster n’existe pas, créez-le depuis la racine du dépôt :
