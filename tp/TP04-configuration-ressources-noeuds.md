@@ -248,6 +248,8 @@ kubectl -n kube-training rollout history deployment/flask-app
 
 Vous devez voir l’ancien ReplicaSet et le nouveau. Kubernetes remplace progressivement les Pods selon la stratégie de mise à jour du Deployment.
 
+Ce Deployment ne déclare pas de stratégie : il utilise donc le défaut, `RollingUpdate`, avec au plus 25 % de Pods en surplus et 25 % indisponibles. C'est ce qui fait que les deux répliques sont remplacées l'une après l'autre, sans coupure.
+
 Vérifiez le nouveau titre avant le rollback :
 
 ```bash
@@ -297,7 +299,7 @@ unset OWNER IMAGE GHCR_USER
 - Les requests influencent le placement ; les limits définissent des plafonds.
 - `nodeSelector` impose une contrainte simple sur les labels des nœuds.
 - `emptyDir` est temporaire : sa durée de vie est celle du Pod, pas celle du conteneur.
-- Un rolling update remplace progressivement les Pods ; `rollout undo` permet de revenir à la révision précédente.
+- Un rolling update remplace progressivement les Pods, selon la stratégie du Deployment (`RollingUpdate` par défaut) ; `rollout undo` permet de revenir à la révision précédente.
 - Un PVC sert à demander un stockage persistant ; il n’est pas créé dans cet exercice.
 
 ## Questions
