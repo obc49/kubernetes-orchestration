@@ -146,8 +146,8 @@ Distinguez ces quatre notions :
 - **Métriques** : mesures numériques suivies dans le temps, comme l’utilisation CPU ou mémoire.
 - **Alertes** : notifications déclenchées lorsqu’une règle ou un seuil est atteint.
 
-Vous avez déjà manipulé les trois premières : les logs au TP03 et dans la partie
-B, les événements dans la partie B, les métriques au TP04 avec `metrics-server`.
+Vous avez déjà manipulé les trois premières : les logs et les événements dans la
+partie B de ce TP, les métriques au TP04 avec `metrics-server`.
 Relisez-les une dernière fois sur l’ensemble du cluster :
 
 ```bash
