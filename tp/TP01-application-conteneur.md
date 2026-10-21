@@ -46,6 +46,23 @@ docker run --rm -d --name flask-tp01 -p 5000:5000 \
   kubernetes-orchestration:tp01
 ```
 
+Le conteneur démarre en arrière-plan : la commande rend la main avant que
+l’application écoute. Attendez qu’elle réponde, sans dépasser trente secondes :
+
+```bash
+for i in $(seq 1 30); do
+  curl -fsS http://localhost:5000/health >/dev/null 2>&1 && break
+  sleep 1
+done
+curl -fsS http://localhost:5000/health >/dev/null 2>&1 \
+  && echo "Application prête" \
+  || { echo "ÉCHEC : /health ne répond pas après 30 s"; docker logs flask-tp01; }
+```
+
+La boucle s’arrête dès que `/health` répond. Si l’application ne démarre pas,
+la seconde commande l’affiche clairement et montre les journaux du conteneur :
+ne poursuivez pas tant que vous n’avez pas vu `Application prête`.
+
 Testez les trois endpoints :
 
 ```bash
