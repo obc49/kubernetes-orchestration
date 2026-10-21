@@ -146,6 +146,22 @@ Distinguez ces quatre notions :
 - **Métriques** : mesures numériques suivies dans le temps, comme l’utilisation CPU ou mémoire.
 - **Alertes** : notifications déclenchées lorsqu’une règle ou un seuil est atteint.
 
+Vous avez déjà manipulé les trois premières : les logs au TP03 et dans la partie
+B, les événements dans la partie B, les métriques au TP04 avec `metrics-server`.
+Relisez-les une dernière fois sur l’ensemble du cluster :
+
+```bash
+kubectl top nodes
+kubectl top pods -A --sort-by=cpu
+```
+
+Si ces commandes répondent `error: Metrics API not available`, `metrics-server`
+n’est pas installé : reprenez la partie C du TP04.
+
+Les alertes sont la seule des quatre notions que nous n’installons pas. Elles
+supposent un système qui conserve les métriques dans le temps et qui évalue des
+règles, par exemple Prometheus avec Alertmanager.
+
 ## Nettoyage
 
 Supprimez les ressources RBAC créées pour ce TP :
@@ -164,6 +180,8 @@ rm -f /tmp/role-tp05.yaml /tmp/service-tp05.yaml
 - Un Role définit des droits dans un namespace ; un RoleBinding les attribue à un compte.
 - `kubectl auth can-i` répond sans qu’il soit nécessaire de tenter l’action.
 - L’effet réel d’une NetworkPolicy dépend du CNI : un manifeste accepté par l’API ne prouve pas que le flux est bloqué.
+
+- Les métriques ne sont pas fournies par Kubernetes seul : il faut installer un composant qui les collecte, ici `metrics-server`.
 
 ## Questions
 

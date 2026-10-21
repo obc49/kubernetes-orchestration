@@ -113,6 +113,7 @@ bonus/                        exercices complémentaires
 - Au TP03, utilisez un token autorisé à lire le package privé (`read:packages`).
 - Un Secret Kubernetes standard n’est pas automatiquement chiffré.
 - Kind est un environnement de lab, pas un cluster de production.
+- Au TP04, `--kubelet-insecure-tls` désactive une vérification de certificat. Ce réglage est réservé aux environnements de test comme Kind.
 
 ## Nettoyer le cluster
 

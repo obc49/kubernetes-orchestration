@@ -87,6 +87,72 @@ kubectl -n kube-training get events --sort-by=.lastTimestamp
 
 Remplacez `<nom-du-pod>` par le nom réel d’un Pod.
 
+### Mesurer la consommation réelle
+
+Jusqu’ici vous avez lu des valeurs déclarées. Elles ne disent pas ce que
+l’application consomme vraiment. L’API de métriques de Kubernetes n’est pas
+installée par défaut : c’est `metrics-server` qui l’alimente, à partir des
+kubelets.
+
+Installez-le :
+
+```bash
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+```
+
+Sur Kind, une étape supplémentaire est nécessaire. Les kubelets présentent un
+certificat auto-signé qui ne contient pas l’adresse IP du nœud : metrics-server
+refuse donc de les interroger. Autorisez cette exception :
+
+```bash
+kubectl -n kube-system patch deployment metrics-server --type=json \
+  -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
+kubectl -n kube-system rollout status deployment/metrics-server
+```
+
+`--kubelet-insecure-tls` désactive la vérification du certificat des kubelets.
+La documentation de metrics-server le réserve explicitement aux environnements
+de test. Ne le reproduisez pas sur un cluster de production : il faut y faire
+signer les certificats des kubelets par l’autorité du cluster.
+
+Patientez une minute avant la suite. Le relevé a lieu toutes les 15 secondes et
+il en faut deux pour que l’API réponde. Tant qu’elle n’est pas prête, la
+commande suivante affiche `error: Metrics API not available` : c’est normal, ne
+relancez pas l’installation.
+
+Vérifiez que l’API est disponible, puis relevez les mesures :
+
+```bash
+kubectl get apiservice v1beta1.metrics.k8s.io
+kubectl top nodes
+kubectl -n kube-training top pods
+```
+
+La colonne `AVAILABLE` doit afficher `True`.
+
+Comparez maintenant deux choses différentes :
+
+```bash
+kubectl describe node <nom-du-worker> | grep -A 6 "Allocated resources"
+kubectl top node <nom-du-worker>
+```
+
+Remplacez `<nom-du-worker>` par le nom d’un nœud worker.
+
+- `describe node` affiche les ressources **réservées**. Les pourcentages sont
+  calculés à partir des `requests` des Pods placés sur le nœud, pas à partir de
+  leur consommation.
+- `top node` affiche la consommation **réelle**, mesurée.
+
+Répondez :
+
+- Que consomme réellement un Pod de l’application, comparé aux `requests: cpu:
+  100m` déclarées ?
+- Un nœud peut-il refuser un nouveau Pod alors que `top node` le montre
+  largement inactif ? Pourquoi ?
+- Si vous divisiez les `requests` par dix, l’application consommerait-elle moins
+  de CPU ?
+
 ## Partie D — Observer le placement avec nodeSelector
 
 Un `nodeSelector` demande à Kubernetes de placer un Pod sur un nœud qui possède un label précis. Nous allons utiliser un Deployment de test pour ne pas modifier l’application principale.
@@ -297,6 +363,7 @@ unset OWNER IMAGE GHCR_USER
 - Un ConfigMap sert à injecter de la configuration non sensible.
 - Un Secret sert à stocker des données sensibles, mais doit être protégé par des droits et une configuration adaptés.
 - Les requests influencent le placement ; les limits définissent des plafonds.
+- Les requests sont une réservation, pas une mesure : l’ordonnanceur compte les requests, `kubectl top` montre la consommation réelle, et les deux peuvent être très éloignées.
 - `nodeSelector` impose une contrainte simple sur les labels des nœuds.
 - `emptyDir` est temporaire : sa durée de vie est celle du Pod, pas celle du conteneur.
 - Un rolling update remplace progressivement les Pods, selon la stratégie du Deployment (`RollingUpdate` par défaut) ; `rollout undo` permet de revenir à la révision précédente.
@@ -306,11 +373,12 @@ unset OWNER IMAGE GHCR_USER
 
 1. Pourquoi faut-il redémarrer le Pod pour relire une variable d’environnement issue du ConfigMap ?
 2. Quelle différence entre requests et limits ?
-3. Pourquoi le Pod reste-t-il Pending quand aucun nœud ne porte le label demandé ?
-4. À quel moment les données d’un `emptyDir` sont-elles perdues ?
-5. Quelle différence entre `emptyDir` et un stockage persistant demandé via PVC ?
-6. Que se passe-t-il pendant un rolling update ?
-7. Que fait exactement la commande `kubectl rollout undo` ?
+3. Un nœud affiche 80 % de CPU réservé dans `describe node` et 5 % de CPU utilisé dans `top node`. Comment expliquez-vous cet écart, et lequel des deux chiffres empêche le placement d’un nouveau Pod ?
+4. Pourquoi le Pod reste-t-il Pending quand aucun nœud ne porte le label demandé ?
+5. À quel moment les données d’un `emptyDir` sont-elles perdues ?
+6. Quelle différence entre `emptyDir` et un stockage persistant demandé via PVC ?
+7. Que se passe-t-il pendant un rolling update ?
+8. Que fait exactement la commande `kubectl rollout undo` ?
 
 
 ---
