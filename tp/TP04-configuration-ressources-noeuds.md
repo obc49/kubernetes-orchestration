@@ -117,17 +117,28 @@ certificat auto-signé qui ne contient pas l’adresse IP du nœud : metrics-ser
 refuse donc de les interroger. Autorisez cette exception :
 
 ```bash
-kubectl -n kube-system get deployment metrics-server \
-  -o jsonpath='{.spec.template.spec.containers[0].args}' \
-  | grep -q kubelet-insecure-tls \
-  || kubectl -n kube-system patch deployment metrics-server --type=json \
-       -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
+kubectl -n kube-system patch deployment metrics-server --type=json \
+  -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
 kubectl -n kube-system rollout status deployment/metrics-server
 ```
 
-La première partie de la commande lit les arguments déjà présents. Le patch
-n’est appliqué que s’il manque. Sans cette précaution, chaque exécution
-ajouterait une fois de plus le même argument à la liste.
+**Ne lancez cette commande qu’une fois.** Le `op: add` sur `args/-` ajoute un
+élément à la fin de la liste : relancée, elle ajouterait une deuxième fois le
+même argument. Contrôlez le résultat :
+
+```bash
+kubectl -n kube-system get deployment metrics-server -o yaml | grep -A 8 "args:"
+```
+
+`--kubelet-insecure-tls` doit apparaître une seule fois. S’il y figure en
+double, ouvrez le déploiement et supprimez la ligne en trop :
+
+```bash
+kubectl -n kube-system edit deployment metrics-server
+```
+
+`kubectl edit` ouvre la ressource dans votre éditeur. À l’enregistrement, la
+modification est envoyée à l’API et un nouveau Pod est créé.
 
 `--kubelet-insecure-tls` désactive la vérification du certificat des kubelets.
 La documentation de metrics-server le réserve explicitement aux environnements
@@ -264,40 +275,47 @@ kubectl -n kube-training rollout status deployment/flask-app
 kubectl -n kube-training get pods -l app.kubernetes.io/name=flask-app
 ```
 
+La commande précédente affiche deux Pods. **Notez leurs deux noms par écrit** :
+vous en aurez besoin jusqu’à la fin de la partie. Nous les appellerons ici
+`<pod-A>` et `<pod-B>`.
+
 5. Écrivez un fichier dans **chacun** des deux Pods. Le Deployment en compte
-   deux : si vous n’écrivez que dans l’un, la suite de l’exercice ne prouve
-   rien.
+   deux : si vous n’écrivez que dans l’un, la suite ne prouvera rien.
 
 ```bash
-for P in $(kubectl -n kube-training get pods -l app.kubernetes.io/name=flask-app -o name); do
-  kubectl -n kube-training exec $P -- sh -c 'echo bonjour > /tmp/formation/test.txt'
-  echo "$P contient : $(kubectl -n kube-training exec $P -- cat /tmp/formation/test.txt)"
-done
+kubectl -n kube-training exec <pod-A> -- sh -c 'echo bonjour > /tmp/formation/test.txt'
+kubectl -n kube-training exec <pod-B> -- sh -c 'echo bonjour > /tmp/formation/test.txt'
 ```
 
-Les deux Pods doivent afficher `bonjour`.
-
-6. Notez le nom d’un Pod, puis supprimez **celui-là** :
+Relisez-les pour vérifier que les deux contiennent bien le fichier :
 
 ```bash
-POD=$(kubectl -n kube-training get pods -l app.kubernetes.io/name=flask-app -o jsonpath='{.items[0].metadata.name}')
-echo "Pod supprimé : $POD"
-kubectl -n kube-training delete pod "$POD"
+kubectl -n kube-training exec <pod-A> -- cat /tmp/formation/test.txt
+kubectl -n kube-training exec <pod-B> -- cat /tmp/formation/test.txt
+```
+
+Les deux doivent afficher `bonjour`.
+
+6. Supprimez `<pod-A>`, et lui seul :
+
+```bash
+kubectl -n kube-training delete pod <pod-A>
 kubectl -n kube-training rollout status deployment/flask-app
+kubectl -n kube-training get pods -l app.kubernetes.io/name=flask-app
 ```
 
-7. Relisez le fichier dans tous les Pods présents :
+La liste montre `<pod-B>`, toujours là, et un Pod au nom nouveau créé par le
+ReplicaSet pour remplacer `<pod-A>`. Notez ce nouveau nom, `<pod-C>`.
+
+7. Relisez le fichier dans ces deux Pods :
 
 ```bash
-for P in $(kubectl -n kube-training get pods -l app.kubernetes.io/name=flask-app -o name); do
-  echo "--- $P"
-  kubectl -n kube-training exec $P -- ls -l /tmp/formation
-done
+kubectl -n kube-training exec <pod-B> -- ls -l /tmp/formation
+kubectl -n kube-training exec <pod-C> -- ls -l /tmp/formation
 ```
 
-Le Pod resté en vie contient toujours `test.txt`. Le Pod qui a remplacé `$POD`
-porte un autre nom et son répertoire est vide : il a reçu un volume `emptyDir`
-neuf.
+`<pod-B>` contient toujours `test.txt`. `<pod-C>` affiche un répertoire vide :
+il a reçu un volume `emptyDir` neuf.
 
 Deux enseignements, et le second compte autant que le premier : un `emptyDir`
 disparaît avec son Pod, et il n’est jamais partagé entre deux Pods, même issus
