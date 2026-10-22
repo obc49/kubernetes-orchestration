@@ -116,13 +116,13 @@ kubectl -n kube-training describe deployment flask-app
 
 Le Deployment demande deux réplicas. Le Service `flask-app` sélectionne les Pods qui portent le label attendu.
 
-Le Deployment déclare trois sondes sur ces endpoints. La startupProbe laisse à l'application le temps de démarrer. La readinessProbe décide si le Pod reçoit du trafic : tant qu'elle échoue, le Service retire le Pod de ses endpoints. La livenessProbe redémarre le conteneur s'il ne répond plus. Observez-les :
+Le Deployment déclare trois sondes sur ces routes. La startupProbe laisse à l'application le temps de démarrer. La readinessProbe décide si le Pod reçoit du trafic : tant qu'elle échoue, le Service retire le Pod de ses endpoints. La livenessProbe redémarre le conteneur s'il ne répond plus. Observez-les :
 
 ```bash
 kubectl -n kube-training get deployment flask-app -o jsonpath='{.spec.template.spec.containers[0].startupProbe}{"\n"}{.spec.template.spec.containers[0].readinessProbe}{"\n"}{.spec.template.spec.containers[0].livenessProbe}{"\n"}'
 ```
 
-Le même conteneur déclare aussi un `securityContext`. Il tourne sous l'utilisateur 10001 et non en root, ne peut pas élever ses privilèges, abandonne toutes les capacités Linux et utilise le profil seccomp par défaut. Ce sont quatre réglages indépendants du code de l'application : c'est le manifeste qui les impose, pas le Dockerfile seul.
+Le même conteneur déclare aussi un `securityContext`. Ouvrez `manifests/20-deployment.yaml` et comptez : il porte six champs — `runAsUser`, `runAsGroup`, `runAsNonRoot`, `allowPrivilegeEscalation`, `capabilities` et `seccompProfile`. L'application tourne donc sous l'utilisateur 10001 et non en root, ne peut pas élever ses privilèges, abandonne toutes les capacités Linux et utilise le profil seccomp par défaut. Ces six réglages sont indépendants du code : c'est le manifeste qui les impose, pas le Dockerfile seul.
 
 ## 7. Tester l’application
 

@@ -56,7 +56,7 @@ kubectl -n kube-training port-forward svc/flask-gateway-nginx 8080:80
 
 Si le port 8080 est déjà utilisé sur votre poste, remplacez-le par 8081 ou un autre port libre. Seul le port local change.
 
-**Terminal 2 :** testez les trois endpoints :
+**Terminal 2 :** testez les trois routes :
 
 ```bash
 curl -i -H 'Host: flask.local' http://127.0.0.1:8080/

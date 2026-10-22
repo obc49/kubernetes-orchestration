@@ -42,14 +42,24 @@ kubectl -n kube-training get pods --show-labels
 kubectl -n kube-training describe svc flask-app
 ```
 
-4. Restaurez le Service depuis le manifeste d’origine :
+4. Avant de restaurer, regardez précisément ce que la panne a changé :
+
+```bash
+kubectl -n kube-training get endpoints flask-app
+```
+
+Les adresses des Pods sont bien là, mais le port annoncé est `8080`. Les
+endpoints n’ont jamais disparu : c’est la cible qui est fausse. Restaurez
+maintenant le Service depuis le manifeste d’origine :
 
 ```bash
 kubectl apply -f manifests/30-service.yaml
 kubectl -n kube-training get endpoints flask-app
 ```
 
-Les endpoints doivent réapparaître.
+Le port annoncé redevient `5000`. Retenez les deux formes de panne : au TP02,
+aucun endpoint parce que le selector ne trouvait aucun Pod ; ici, des endpoints
+présents mais qui visent un port sur lequel personne n’écoute.
 
 ## Partie B — Utiliser les outils de diagnostic
 
