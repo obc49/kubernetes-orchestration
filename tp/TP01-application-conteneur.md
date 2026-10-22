@@ -47,21 +47,23 @@ docker run --rm -d --name flask-tp01 -p 5000:5000 \
 ```
 
 Le conteneur démarre en arrière-plan : la commande rend la main avant que
-l’application écoute. Attendez qu’elle réponde, sans dépasser trente secondes :
+l’application écoute. Attendez qu’elle réponde avant de la tester :
 
 ```bash
-for i in $(seq 1 30); do
-  curl -fsS http://localhost:5000/health >/dev/null 2>&1 && break
-  sleep 1
-done
-curl -fsS http://localhost:5000/health >/dev/null 2>&1 \
-  && echo "Application prête" \
-  || { echo "ÉCHEC : /health ne répond pas après 30 s"; docker logs flask-tp01; }
+curl --retry 15 --retry-delay 1 --retry-connrefused -fsS http://localhost:5000/health
 ```
 
-La boucle s’arrête dès que `/health` répond. Si l’application ne démarre pas,
-la seconde commande l’affiche clairement et montre les journaux du conteneur :
-ne poursuivez pas tant que vous n’avez pas vu `Application prête`.
+`--retry 15` et `--retry-delay 1` autorisent quinze tentatives espacées d’une
+seconde ; `--retry-connrefused` demande de réessayer aussi quand rien n’écoute
+encore. Pendant l’attente, des lignes `Couldn’t connect to server` peuvent
+s’afficher : c’est normal. Vous devez voir apparaître `{"status":"ok"}`.
+
+Si rien ne vient au bout de quinze secondes, l’application n’a pas démarré.
+Regardez pourquoi avant de poursuivre :
+
+```bash
+docker logs flask-tp01
+```
 
 Testez les trois endpoints :
 
