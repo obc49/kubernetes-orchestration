@@ -122,6 +122,11 @@ kubectl -n kube-system patch deployment metrics-server --type=json \
 kubectl -n kube-system rollout status deployment/metrics-server
 ```
 
+`--kubelet-insecure-tls` désactive la vérification du certificat des kubelets.
+La documentation de metrics-server le réserve explicitement aux environnements
+de test. Ne le reproduisez pas sur un cluster de production : il faut y faire
+signer les certificats des kubelets par l’autorité du cluster.
+
 **Ne lancez cette commande qu’une fois.** Le `op: add` sur `args/-` ajoute un
 élément à la fin de la liste : relancée, elle ajouterait une deuxième fois le
 même argument. Contrôlez le résultat :
@@ -139,11 +144,6 @@ kubectl -n kube-system edit deployment metrics-server
 
 `kubectl edit` ouvre la ressource dans votre éditeur. À l’enregistrement, la
 modification est envoyée à l’API et un nouveau Pod est créé.
-
-`--kubelet-insecure-tls` désactive la vérification du certificat des kubelets.
-La documentation de metrics-server le réserve explicitement aux environnements
-de test. Ne le reproduisez pas sur un cluster de production : il faut y faire
-signer les certificats des kubelets par l’autorité du cluster.
 
 Patientez une minute avant la suite. Le relevé a lieu toutes les 15 secondes et
 il en faut deux pour que l’API réponde. Tant qu’elle n’est pas prête, la
@@ -325,7 +325,7 @@ du même Deployment.
 
 Cette partie vous montre comment publier une nouvelle version, effectuer un rolling update et revenir à la version précédente.
 
-1. Dans `app/app.py`, ligne 28, remplacez le titre HTML :
+1. Dans `app/app.py`, repérez la ligne qui contient `<title>` et remplacez-la :
 
 ```html
 <title>Kubernetes Orchestration - Flask</title>
