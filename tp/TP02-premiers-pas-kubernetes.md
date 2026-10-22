@@ -82,6 +82,19 @@ kubectl get svc web-svc -n tp02 -o yaml
 
 Les labels doivent correspondre pour que le Service trouve le Pod.
 
+Kubernetes tient aussi une seconde représentation de ces adresses, plus récente
+et plus riche, les EndpointSlice :
+
+```bash
+kubectl get endpointslices -n tp02
+```
+
+`Endpoints` est l’API d’origine ; c’est elle que nous lisons dans ces TP parce
+que sa sortie tient sur une ligne. `EndpointSlice` est celle que Kubernetes
+utilise réellement aujourd’hui et que vous rencontrerez en production : elle
+découpe les adresses en tranches et porte des informations que l’objet
+`Endpoints` ne sait pas représenter.
+
 ## 6. Accéder au Service depuis votre poste
 
 Dans un terminal, lancez :
@@ -140,6 +153,7 @@ La suppression du namespace supprime les ressources qu’il contient.
 - Les labels identifient des ressources ; les selectors permettent de les retrouver.
 - Un Service sélectionne les Pods par leurs labels.
 - `port-forward` ouvre un accès temporaire depuis votre poste ; ce n’est pas une exposition de production.
+- `Endpoints` et `EndpointSlice` décrivent les mêmes adresses : la première est l’API d’origine, la seconde celle que Kubernetes utilise aujourd’hui.
 
 ## Questions
 
