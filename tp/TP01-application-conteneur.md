@@ -46,6 +46,25 @@ docker run --rm -d --name flask-tp01 -p 5000:5000 \
   kubernetes-orchestration:tp01
 ```
 
+Le conteneur démarre en arrière-plan : la commande rend la main avant que
+l’application écoute. Attendez qu’elle réponde avant de la tester :
+
+```bash
+curl --retry 15 --retry-delay 1 --retry-connrefused -fsS http://localhost:5000/health
+```
+
+`--retry 15` et `--retry-delay 1` autorisent quinze tentatives espacées d’une
+seconde ; `--retry-connrefused` demande de réessayer aussi quand rien n’écoute
+encore. Pendant l’attente, des lignes `Couldn’t connect to server` peuvent
+s’afficher : c’est normal. Vous devez voir apparaître `{"status":"ok"}`.
+
+Si rien ne vient au bout de quinze secondes, l’application n’a pas démarré.
+Regardez pourquoi avant de poursuivre :
+
+```bash
+docker logs flask-tp01
+```
+
 Testez les trois endpoints :
 
 ```bash

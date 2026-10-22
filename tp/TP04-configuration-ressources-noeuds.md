@@ -94,10 +94,22 @@ l’application consomme vraiment. L’API de métriques de Kubernetes n’est p
 installée par défaut : c’est `metrics-server` qui l’alimente, à partir des
 kubelets.
 
-Installez-le :
+Vérifiez d’abord la version de votre cluster : `metrics-server` 0.9 demande
+Kubernetes 1.34 ou plus récent.
 
 ```bash
-kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+kubectl version
+```
+
+Si votre serveur est plus ancien, remplacez `v0.9.0` par `v0.8.1` dans la
+commande suivante : la série 0.8 accepte Kubernetes 1.31 et au-delà.
+
+Installez-le. La version est fixée volontairement : `latest` change avec le
+temps et ne donnerait pas le même résultat à tout le monde.
+
+```bash
+MS=https://github.com/kubernetes-sigs/metrics-server
+kubectl apply -f $MS/releases/download/v0.9.0/components.yaml
 ```
 
 Sur Kind, une étape supplémentaire est nécessaire. Les kubelets présentent un
@@ -109,6 +121,24 @@ kubectl -n kube-system patch deployment metrics-server --type=json \
   -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
 kubectl -n kube-system rollout status deployment/metrics-server
 ```
+
+**Ne lancez cette commande qu’une fois.** Le `op: add` sur `args/-` ajoute un
+élément à la fin de la liste : relancée, elle ajouterait une deuxième fois le
+même argument. Contrôlez le résultat :
+
+```bash
+kubectl -n kube-system get deployment metrics-server -o yaml | grep -A 8 "args:"
+```
+
+`--kubelet-insecure-tls` doit apparaître une seule fois. S’il y figure en
+double, ouvrez le déploiement et supprimez la ligne en trop :
+
+```bash
+kubectl -n kube-system edit deployment metrics-server
+```
+
+`kubectl edit` ouvre la ressource dans votre éditeur. À l’enregistrement, la
+modification est envoyée à l’API et un nouveau Pod est créé.
 
 `--kubelet-insecure-tls` désactive la vérification du certificat des kubelets.
 La documentation de metrics-server le réserve explicitement aux environnements
@@ -237,30 +267,59 @@ Un volume `emptyDir` est un répertoire temporaire créé pour un Pod. Les conte
 
 Conservez le champ `imagePullSecrets` ajouté au TP03. Respectez l’indentation YAML.
 
-4. Appliquez le Deployment et vérifiez le montage :
+4. Appliquez le Deployment et attendez que les deux Pods soient prêts :
 
 ```bash
 kubectl apply -f manifests/20-deployment.yaml
 kubectl -n kube-training rollout status deployment/flask-app
-kubectl -n kube-training get pods
-kubectl -n kube-training exec deployment/flask-app -- sh -c 'echo "bonjour" > /tmp/formation/test.txt && cat /tmp/formation/test.txt'
+kubectl -n kube-training get pods -l app.kubernetes.io/name=flask-app
 ```
 
-5. Supprimez un Pod du Deployment, puis observez sa recréation :
+La commande précédente affiche deux Pods. **Notez leurs deux noms par écrit** :
+vous en aurez besoin jusqu’à la fin de la partie. Nous les appellerons ici
+`<pod-A>` et `<pod-B>`.
+
+5. Écrivez un fichier dans **chacun** des deux Pods. Le Deployment en compte
+   deux : si vous n’écrivez que dans l’un, la suite ne prouvera rien.
 
 ```bash
-kubectl -n kube-training get pods
-kubectl -n kube-training delete pod <nom-du-pod>
-kubectl -n kube-training get pods -w
+kubectl -n kube-training exec <pod-A> -- sh -c 'echo bonjour > /tmp/formation/test.txt'
+kubectl -n kube-training exec <pod-B> -- sh -c 'echo bonjour > /tmp/formation/test.txt'
 ```
 
-Arrêtez le suivi avec `Ctrl+C`. Une fois le nouveau Pod prêt, vérifiez si le fichier existe :
+Relisez-les pour vérifier que les deux contiennent bien le fichier :
 
 ```bash
-kubectl -n kube-training exec deployment/flask-app -- sh -c 'ls -l /tmp/formation'
+kubectl -n kube-training exec <pod-A> -- cat /tmp/formation/test.txt
+kubectl -n kube-training exec <pod-B> -- cat /tmp/formation/test.txt
 ```
 
-Le nouveau Pod possède un nouveau volume `emptyDir` : l’ancien fichier n’est plus là.
+Les deux doivent afficher `bonjour`.
+
+6. Supprimez `<pod-A>`, et lui seul :
+
+```bash
+kubectl -n kube-training delete pod <pod-A>
+kubectl -n kube-training rollout status deployment/flask-app
+kubectl -n kube-training get pods -l app.kubernetes.io/name=flask-app
+```
+
+La liste montre `<pod-B>`, toujours là, et un Pod au nom nouveau créé par le
+ReplicaSet pour remplacer `<pod-A>`. Notez ce nouveau nom, `<pod-C>`.
+
+7. Relisez le fichier dans ces deux Pods :
+
+```bash
+kubectl -n kube-training exec <pod-B> -- ls -l /tmp/formation
+kubectl -n kube-training exec <pod-C> -- ls -l /tmp/formation
+```
+
+`<pod-B>` contient toujours `test.txt`. `<pod-C>` affiche un répertoire vide :
+il a reçu un volume `emptyDir` neuf.
+
+Deux enseignements, et le second compte autant que le premier : un `emptyDir`
+disparaît avec son Pod, et il n’est jamais partagé entre deux Pods, même issus
+du même Deployment.
 
 ## Partie F — Mettre à jour l’application et revenir en arrière
 
@@ -365,7 +424,7 @@ unset OWNER IMAGE GHCR_USER
 - Les requests influencent le placement ; les limits définissent des plafonds.
 - Les requests sont une réservation, pas une mesure : l’ordonnanceur compte les requests, `kubectl top` montre la consommation réelle, et les deux peuvent être très éloignées.
 - `nodeSelector` impose une contrainte simple sur les labels des nœuds.
-- `emptyDir` est temporaire : sa durée de vie est celle du Pod, pas celle du conteneur.
+- `emptyDir` est temporaire : sa durée de vie est celle du Pod, pas celle du conteneur. Il appartient à un seul Pod et n’est jamais partagé entre deux Pods d’un même Deployment.
 - Un rolling update remplace progressivement les Pods, selon la stratégie du Deployment (`RollingUpdate` par défaut) ; `rollout undo` permet de revenir à la révision précédente.
 - Un PVC sert à demander un stockage persistant ; il n’est pas créé dans cet exercice.
 
