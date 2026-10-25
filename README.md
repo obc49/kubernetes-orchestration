@@ -92,6 +92,14 @@ kubectl get nodes -o wide
 
 Les trois nœuds doivent être `Ready`.
 
+La configuration épingle l’image `kindest/node:v1.37.0` : tout le monde travaille ainsi sur la même version de Kubernetes. C’est aussi ce qu’attendent les composants installés pendant les TP — `metrics-server` 0.9 demande Kubernetes 1.34 ou plus récent, NGINX Gateway Fabric 2.7.2 demande 1.32 ou plus récent.
+
+```bash
+kubectl version
+```
+
+Le serveur doit répondre `v1.37.x`. Si la création du cluster échoue en indiquant que l’image est inconnue, votre binaire `kind` est trop ancien : mettez-le à jour.
+
 ## Organisation du dépôt
 
 ```text
