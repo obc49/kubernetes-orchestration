@@ -24,6 +24,8 @@ Cette commande installe le canal standard de Gateway API, soit onze définitions
 
 ## 3. Installer NGINX Gateway Fabric avec Helm
 
+Helm est le gestionnaire de paquets de Kubernetes. Trois mots suffisent ici. Un **chart** est un ensemble de manifestes laissés paramétrables. Les **values** sont les paramètres que vous fournissez, ici avec `--set`. Une **release** est une installation nommée — `ngf` dans la commande ci-dessous — que l’on peut ensuite mettre à jour avec `helm upgrade` ou annuler avec `helm rollback`.
+
 ```bash
 helm install ngf oci://ghcr.io/nginx/charts/nginx-gateway-fabric \
   --version 2.7.2 \
