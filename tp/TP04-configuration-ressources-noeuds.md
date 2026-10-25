@@ -244,7 +244,7 @@ kubectl label node <nom-du-worker> tp04-
 rm -f /tmp/deployment-tp04.yaml
 ```
 
-## Partie E — Monter un volume emptyDir (facultatif)
+## Partie E — Stocker des données : emptyDir, puis volume persistant
 
 Un volume `emptyDir` est un répertoire temporaire créé pour un Pod. Les conteneurs du même Pod peuvent le partager. Les données restent disponibles pendant la vie du Pod, mais elles sont perdues quand ce Pod est supprimé et remplacé.
 
@@ -320,6 +320,101 @@ il a reçu un volume `emptyDir` neuf.
 Deux enseignements, et le second compte autant que le premier : un `emptyDir`
 disparaît avec son Pod, et il n’est jamais partagé entre deux Pods, même issus
 du même Deployment.
+
+### Un volume qui survit au Pod
+
+Un `emptyDir` ne convient donc pas pour conserver quoi que ce soit. Pour cela, le Pod réclame un **PersistentVolumeClaim**, un PVC : il ne demande pas un disque précis, il demande un volume répondant à des critères, et le cluster le lui fournit.
+
+Nous le faisons sur un Deployment de test, à part, pour ne pas toucher à l’application.
+
+8. Créez le fichier `/tmp/stockage-tp04.yaml` :
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: donnees-tp04
+  namespace: kube-training
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stockage-tp04
+  namespace: kube-training
+  labels:
+    app.kubernetes.io/name: stockage-tp04
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: stockage-tp04
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: stockage-tp04
+    spec:
+      containers:
+        - name: outil
+          image: busybox:1.36
+          command: ["sh", "-c", "sleep 36000"]
+          volumeMounts:
+            - name: donnees
+              mountPath: /donnees
+      volumes:
+        - name: donnees
+          persistentVolumeClaim:
+            claimName: donnees-tp04
+```
+
+Une seule réplique, et ce n’est pas un détail : `ReadWriteOnce` signifie qu’un seul nœud à la fois peut monter ce volume.
+
+9. Appliquez, puis regardez l’état du PVC :
+
+```bash
+kubectl apply -f /tmp/stockage-tp04.yaml
+kubectl -n kube-training get pvc donnees-tp04
+```
+
+Le PVC peut apparaître en `Pending`. Ce n’est pas une erreur : la StorageClass fournie par Kind attend qu’un Pod réclame le volume avant de le créer.
+
+```bash
+kubectl -n kube-training rollout status deployment/stockage-tp04
+kubectl -n kube-training get pvc,pods -l app.kubernetes.io/name=stockage-tp04
+```
+
+Le PVC est maintenant `Bound`. Notez le nom du Pod, nous l’appellerons `<pod-X>`.
+
+10. Écrivez un fichier dans le volume, supprimez le Pod, puis relisez :
+
+```bash
+kubectl -n kube-training exec <pod-X> -- sh -c 'echo persistant > /donnees/test.txt'
+kubectl -n kube-training exec <pod-X> -- cat /donnees/test.txt
+kubectl -n kube-training delete pod <pod-X>
+kubectl -n kube-training rollout status deployment/stockage-tp04
+kubectl -n kube-training get pods -l app.kubernetes.io/name=stockage-tp04
+```
+
+Relevez le nom du nouveau Pod, `<pod-Y>`, puis relisez le fichier :
+
+```bash
+kubectl -n kube-training exec <pod-Y> -- cat /donnees/test.txt
+```
+
+Le contenu est toujours là. C’est toute la différence avec la première moitié de cette partie : le Pod a été remplacé, le volume lui a survécu et a été rattaché au nouveau.
+
+11. Nettoyez :
+
+```bash
+kubectl -n kube-training delete deployment stockage-tp04
+kubectl -n kube-training delete pvc donnees-tp04
+```
+
+Supprimer le PVC détruit le volume : la StorageClass de ce lab est réglée pour cela. Dans un cluster de production, ce réglage est l’un des premiers à vérifier.
 
 ## Partie F — Mettre à jour l’application et revenir en arrière
 
@@ -426,7 +521,8 @@ unset OWNER IMAGE GHCR_USER
 - `nodeSelector` impose une contrainte simple sur les labels des nœuds.
 - `emptyDir` est temporaire : sa durée de vie est celle du Pod, pas celle du conteneur. Il appartient à un seul Pod et n’est jamais partagé entre deux Pods d’un même Deployment.
 - Un rolling update remplace progressivement les Pods, selon la stratégie du Deployment (`RollingUpdate` par défaut) ; `rollout undo` permet de revenir à la révision précédente.
-- Un PVC sert à demander un stockage persistant ; il n’est pas créé dans cet exercice.
+- Un PVC demande un volume au cluster ; une StorageClass le provisionne. Contrairement à `emptyDir`, son contenu survit au remplacement du Pod.
+- `ReadWriteOnce` limite le volume à un seul nœud à la fois : c’est pourquoi le Deployment de test n’a qu’une réplique.
 
 ## Questions
 
@@ -435,7 +531,7 @@ unset OWNER IMAGE GHCR_USER
 3. Un nœud affiche 80 % de CPU réservé dans `describe node` et 5 % de CPU utilisé dans `top node`. Comment expliquez-vous cet écart, et lequel des deux chiffres empêche le placement d’un nouveau Pod ?
 4. Pourquoi le Pod reste-t-il Pending quand aucun nœud ne porte le label demandé ?
 5. À quel moment les données d’un `emptyDir` sont-elles perdues ?
-6. Quelle différence entre `emptyDir` et un stockage persistant demandé via PVC ?
+6. Quelle différence avez-vous observée entre `emptyDir` et le volume monté par PVC, au moment où le Pod a été remplacé ?
 7. Que se passe-t-il pendant un rolling update ?
 8. Que fait exactement la commande `kubectl rollout undo` ?
 

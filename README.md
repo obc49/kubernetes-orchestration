@@ -129,6 +129,7 @@ Après les six TP principaux, vous pouvez poursuivre avec :
 
 - [Bonus — Déployer une application avec Flux](bonus/fluxcd/README.md)
 - [Bonus — Utiliser Vault avec External Secrets Operator](bonus/vault-eso/README.md)
+- [Projet intégrateur — une base de données et ses traitements](bonus/projet-integrateur/README.md)
 
 ## Documentation officielle
 
