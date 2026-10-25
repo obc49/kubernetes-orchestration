@@ -125,7 +125,55 @@ Résultat attendu : la première commande répond `yes`, la seconde `no`. Le com
 
 ## Partie D — Comprendre les limites de la sécurité réseau
 
-Une NetworkPolicy peut limiter les flux entre Pods, mais son effet dépend du plugin réseau (CNI) qui équipe le cluster. Dans ce lab, ne concluez pas qu’un flux est bloqué simplement parce qu’un manifeste NetworkPolicy est accepté par l’API.
+Une NetworkPolicy décrit les flux autorisés entre Pods, mais c’est le plugin réseau (CNI) du cluster qui l’applique — ou ne l’applique pas. Nous allons le constater plutôt que le croire sur parole.
+
+1. Lancez un Pod client et vérifiez qu’il joint l’application :
+
+```bash
+kubectl -n kube-training run client --image=busybox:1.36 --restart=Never -- sleep 3600
+kubectl -n kube-training wait --for=condition=Ready pod/client --timeout=120s
+kubectl -n kube-training exec client -- wget -qO- http://flask-app/health
+```
+
+Vous devez voir `{"status":"ok"}`.
+
+2. Créez le fichier `/tmp/refus-tp05.yaml`, qui interdit **tout** trafic entrant vers l’application :
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: refuser-tout
+  namespace: kube-training
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: flask-app
+  policyTypes: ["Ingress"]
+  ingress: []
+```
+
+Une liste `ingress` vide signifie : aucune source autorisée.
+
+3. Appliquez-la, puis refaites exactement le même test :
+
+```bash
+kubectl apply -f /tmp/refus-tp05.yaml
+kubectl -n kube-training get networkpolicy
+kubectl -n kube-training exec client -- wget -qO- http://flask-app/health
+```
+
+**La requête passe toujours.** Le manifeste est pourtant valide, accepté par l’API, et visible dans `get networkpolicy`. C’est tout le propos de cette partie : le CNI livré avec Kind n’implémente pas les NetworkPolicy, il se contente de les stocker. Sur un cluster équipé de Calico ou de Cilium, la même règle aurait coupé le flux.
+
+Retenez la méthode : une règle de sécurité réseau ne se vérifie pas en relisant son manifeste, elle se vérifie en tentant le flux qu’elle est censée interdire.
+
+4. Nettoyez :
+
+```bash
+kubectl -n kube-training delete networkpolicy refuser-tout
+kubectl -n kube-training delete pod client
+rm -f /tmp/refus-tp05.yaml
+```
 
 Répondez à ces questions :
 - Quel risque réduit une NetworkPolicy ?
@@ -189,8 +237,7 @@ rm -f /tmp/role-tp05.yaml /tmp/service-tp05.yaml
 - Un Service sans endpoints et un Service avec des endpoints qui ne répond pas sont deux pannes différentes : la première vient du selector, la seconde du port visé sur le Pod.
 - Un Role définit des droits dans un namespace ; un RoleBinding les attribue à un compte.
 - `kubectl auth can-i` répond sans qu’il soit nécessaire de tenter l’action.
-- L’effet réel d’une NetworkPolicy dépend du CNI : un manifeste accepté par l’API ne prouve pas que le flux est bloqué.
-
+- L’effet réel d’une NetworkPolicy dépend du CNI : nous en avons appliqué une qui interdit tout, et le flux est passé quand même. Un manifeste accepté par l’API ne prouve rien ; seul le test du flux le prouve.
 - Les métriques ne sont pas fournies par Kubernetes seul : il faut installer un composant qui les collecte, ici `metrics-server`.
 
 ## Questions
