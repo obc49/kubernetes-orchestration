@@ -371,7 +371,7 @@ spec:
             claimName: donnees-tp04
 ```
 
-Une seule réplique, et ce n’est pas un détail : `ReadWriteOnce` signifie qu’un seul nœud à la fois peut monter ce volume.
+Une seule réplique : `ReadWriteOnce` autorise le montage par un seul **nœud** à la fois, et non par un seul Pod. Avec deux répliques, celle que l’ordonnanceur placerait sur l’autre nœud resterait bloquée.
 
 9. Appliquez, puis regardez l’état du PVC :
 
@@ -406,6 +406,8 @@ kubectl -n kube-training exec <pod-Y> -- cat /donnees/test.txt
 ```
 
 Le contenu est toujours là. C’est toute la différence avec la première moitié de cette partie : le Pod a été remplacé, le volume lui a survécu et a été rattaché au nouveau.
+
+Où sont ces données ? Cela dépend de la StorageClass. Celle de Kind les écrit dans un répertoire du nœud, et le nœud est un conteneur Docker de votre poste : `kind delete cluster` les emporte. Sur un vrai cluster, le même PVC s’adresserait à une baie ou à un disque cloud, sans qu’une ligne du manifeste change.
 
 11. Nettoyez :
 

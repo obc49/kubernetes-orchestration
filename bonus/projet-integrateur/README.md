@@ -132,13 +132,11 @@ spec:
             claimName: postgres-data
 ```
 
-Trois points méritent votre attention avant d’appliquer.
+Trois points à retenir avant d’appliquer :
 
-**`replicas: 1`, et pas deux.** Le PVC est en `ReadWriteOnce` : un seul nœud peut le monter. Deux répliques derrière le même volume ne démarreraient pas toutes les deux. C’est la première chose à savoir quand on met une base dans Kubernetes, et c’est aussi la raison pour laquelle les bases se déploient en général avec un `StatefulSet` plutôt qu’un `Deployment`.
-
-**`fsGroup: 999`.** Il est au niveau du Pod, dans `spec.securityContext`, et non au niveau du conteneur : c’est le seul endroit où Kubernetes le lit pour ajuster les droits du volume. L’image Debian de PostgreSQL fait tourner le serveur sous l’utilisateur `postgres`, d’UID 999. Sans cette ligne, le processus ne peut pas écrire dans le volume. Si vous passez à une variante Alpine, l’UID y vaut 70 : ajustez.
-
-**`mountPath: /var/lib/postgresql`**, et non `/var/lib/postgresql/data`. Depuis PostgreSQL 18, l’image place les données dans un sous-répertoire versionné et déclare son volume un cran plus haut. Le chemin que vous trouverez dans la plupart des tutoriels vise les versions 17 et antérieures.
+- **`replicas: 1`.** Deux serveurs PostgreSQL écrivant dans le même répertoire corrompraient la base. Pour la même raison, une base réelle se déploie avec un `StatefulSet` ou un opérateur, pas avec un `Deployment`.
+- **`fsGroup: 999`**, au niveau du Pod et non du conteneur : c’est là que Kubernetes le lit pour ajuster les droits du volume. L’image Debian fait tourner PostgreSQL sous l’UID 999 ; en variante Alpine, c’est 70.
+- **`mountPath: /var/lib/postgresql`**, et non `/var/lib/postgresql/data`. Depuis PostgreSQL 18, l’image a déplacé son volume d’un cran. Le chemin des tutoriels vise les versions 17 et antérieures.
 
 Appliquez, puis observez le PVC avant que le Pod ne démarre :
 
@@ -334,6 +332,21 @@ Dans l’ordre où cela vous servira :
 2. **Installez la même base par un chart Helm** plutôt qu’avec vos manifestes, et comparez. C’est ainsi que se livrent la plupart des composants d’une plateforme de données.
 3. **Remplacez le `psql` du CronJob par votre propre traitement**, dans votre propre image. Le squelette ne change pas.
 4. **Donnez au CronJob un compte de service dédié** et les seuls droits dont il a besoin, comme au TP05.
+
+## Liens utiles
+
+Documentation officielle des objets rencontrés dans ce projet.
+
+| Sujet | Lien |
+|---|---|
+| Volumes et PersistentVolumeClaim | [Persistent Volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) · [Volumes](https://kubernetes.io/docs/concepts/storage/volumes/) |
+| Deployment, Job, CronJob, StatefulSet | [Workload Management](https://kubernetes.io/docs/concepts/workloads/controllers/) |
+| StatefulSet en détail | [StatefulSets](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/) |
+| Sondes readiness et liveness | [Configure Liveness, Readiness and Startup Probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) |
+| Secret, ressources, securityContext | [Configure Pods and Containers](https://kubernetes.io/docs/tasks/configure-pod-container/) |
+| Cluster local | [Kind](https://kind.sigs.k8s.io/) |
+
+Une seule image est utilisée ici, `postgres:18`, pour la base comme pour les traitements. Ses variantes et ses variables d’environnement sont décrites dans le [dépôt officiel de l’image](https://github.com/docker-library/postgres).
 
 ---
 
