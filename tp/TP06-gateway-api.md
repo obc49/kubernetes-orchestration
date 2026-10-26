@@ -131,6 +131,7 @@ Arrêtez le `port-forward` avec `Ctrl+C`. Cette vérification permet de distingu
 
 Les TP bonus sont facultatifs. Faites-les après les six TP principaux.
 
+- [Projet intégrateur — une base de données et ses traitements](../bonus/projet-integrateur/README.md)
 - [Bonus — Déployer une application avec Flux](../bonus/fluxcd/README.md)
 - [Bonus — Utiliser Vault avec External Secrets Operator](../bonus/vault-eso/README.md)
 
