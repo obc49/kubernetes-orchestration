@@ -2,7 +2,7 @@
 
 ## Objectif
 
-Utiliser les commandes de base pour trouver la cause d’un problème, corriger la configuration, puis vérifier les droits d’accès d’un compte de service.
+Utiliser les commandes de base pour trouver la cause d’un problème, corriger la configuration, vérifier les droits d’accès d’un compte de service, puis constater qu’une règle réseau acceptée par l’API n’est pas forcément appliquée.
 
 ## Prérequis
 
@@ -77,7 +77,7 @@ Remplacez `<nom-du-pod>` par un nom de Pod existant. Si un conteneur a redémarr
 
 ## Partie C — Vérifier les droits avec RBAC
 
-RBAC permet de définir ce qu’un compte a le droit de faire dans Kubernetes. Nous allons autoriser un compte de service à lire les ConfigMaps du namespace `kube-training`.
+RBAC, pour *Role-Based Access Control*, permet de définir ce qu’un compte a le droit de faire dans Kubernetes. Nous allons autoriser un compte de service à lire les ConfigMaps du namespace `kube-training`.
 
 Créez les ressources :
 

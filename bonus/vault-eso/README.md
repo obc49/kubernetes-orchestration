@@ -39,6 +39,7 @@ Ajoutez le dépôt Helm HashiCorp et installez Vault :
 helm repo add hashicorp https://helm.releases.hashicorp.com
 helm repo update
 helm install vault hashicorp/vault \
+  --version 0.34.1 \
   --namespace vault --create-namespace \
   --set "server.dev.enabled=true" \
   --wait --timeout 5m
@@ -67,7 +68,7 @@ En mode développement, Vault est initialisé automatiquement. La configuration 
 
 ## 2. Créer une valeur de démonstration dans Vault
 
-Toujours dans le shell du Pod Vault, activez un moteur KV version 2 et ajoutez une valeur fictive :
+En mode développement, un moteur KV version 2 est déjà monté sur `secret/`. Vérifiez-le, puis ajoutez une valeur fictive :
 
 ```bash
 vault secrets list
@@ -109,13 +110,13 @@ kubectl get crd | grep external-secrets
 
 Pour ce lab uniquement, nous allons utiliser le token de développement de Vault. Cette méthode simplifie la démonstration, mais **ne doit pas être utilisée en production**. En production, choisissez une méthode d’authentification adaptée et des permissions minimales.
 
-Récupérez le token depuis la configuration du Pod Vault uniquement pour le lab :
+Récupérez le token de développement. Il s’affiche en clair dans votre terminal, et c’est acceptable ici pour une seule raison : en mode développement, ce token est une valeur connue, fixée au démarrage. C’est précisément pourquoi ce mode ne doit jamais sortir d’un lab.
 
 ```bash
 kubectl -n vault exec vault-0 -- printenv VAULT_DEV_ROOT_TOKEN_ID
 ```
 
-Copiez la valeur affichée dans une variable de shell. Ne l’écrivez pas dans un fichier :
+Reportez la valeur affichée dans une variable de shell, sans l’écrire dans un fichier :
 
 ```bash
 read -s -p "Token Vault de développement : " VAULT_TOKEN
@@ -126,11 +127,14 @@ Créez un Secret dans le namespace où ESO sera configuré :
 
 ```bash
 kubectl -n kube-training create secret generic vault-token \
-  --from-literal=token="$VAULT_TOKEN"
+  --from-literal=token="$VAULT_TOKEN" \
+  --dry-run=client -o yaml | kubectl apply -f -
 unset VAULT_TOKEN
 ```
 
-Le token reste une donnée sensible même dans un lab. Ne l’affichez pas et ne le commitez pas.
+C’est la forme employée au TP03 : elle crée le Secret ou le met à jour, vous pouvez donc reprendre ce TP après une tentative interrompue.
+
+Le token reste une donnée sensible même dans un lab. Ne le commitez pas.
 
 ## 5. Créer un SecretStore
 
@@ -272,3 +276,7 @@ kubectl delete namespace external-secrets vault
 - [External Secrets Operator — documentation](https://external-secrets.io/)
 - [HashiCorp Vault — documentation](https://developer.hashicorp.com/vault/docs)
 - [Kubernetes — Secrets](https://kubernetes.io/docs/concepts/configuration/secret/)
+
+---
+
+**Retour :** [README principal](../../README.md) · [Index des TP](../../tp/README.md)

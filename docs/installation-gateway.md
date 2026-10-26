@@ -14,7 +14,7 @@ Les trois nœuds doivent être `Ready`. Aucun port fixe de votre poste n’est r
 
 ## 2. Installer les ressources Gateway API
 
-Nous utilisons NGINX Gateway Fabric 2.7.2 pour ce lab. Installez les CRD Gateway API standard correspondant à cette version, soit Gateway API v1.6.1 :
+Nous utilisons NGINX Gateway Fabric 2.7.2 pour ce lab. Gateway API n’est pas livré avec Kubernetes : ses types d’objets s’ajoutent à l’API sous forme de CRD, des *Custom Resource Definitions*. Installez ceux du canal standard correspondant à cette version, soit Gateway API v1.6.1 :
 
 ```bash
 kubectl kustomize "https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.7.2" | kubectl apply -f -
