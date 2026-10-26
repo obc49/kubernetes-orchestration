@@ -9,8 +9,8 @@ Ce dépôt contient l’application fil rouge, les manifestes et les six TP de l
 | [TP01](tp/TP01-application-conteneur.md) | Application, Docker et GHCR | Vous avez construit et publié l’image de l’application. |
 | [TP02](tp/TP02-premiers-pas-kubernetes.md) | Premiers pas dans Kubernetes | Vous savez créer un Pod, un namespace et un Service, puis tester avec `port-forward`. |
 | [TP03](tp/TP03-pod-deployment-service.md) | Déployer l’application | Vous avez déployé l’application et corrigé le problème d’accès à une image privée. |
-| [TP04](tp/TP04-configuration-ressources-noeuds.md) | Configuration, ressources et mise à jour | Vous avez modifié un ConfigMap, observé requests/limits, mis à jour l’application par rolling update et annulé la mise à jour. |
-| [TP05](tp/TP05-administration-diagnostic-securite.md) | Diagnostic et sécurité | Vous avez diagnostiqué un Service qui a des endpoints mais ne répond pas, et vérifié des droits RBAC. |
+| [TP04](tp/TP04-configuration-ressources-noeuds.md) | Configuration, ressources et mise à jour | Vous avez modifié un ConfigMap, lu requests et limits puis mesuré la consommation réelle, comparé un volume temporaire et un volume persistant, mis à jour l’application par rolling update et annulé la mise à jour. |
+| [TP05](tp/TP05-administration-diagnostic-securite.md) | Diagnostic et sécurité | Vous avez diagnostiqué un Service qui a des endpoints mais ne répond pas, vérifié des droits RBAC et éprouvé une NetworkPolicy. |
 | [TP06](tp/TP06-gateway-api.md) | Gateway API | Vous avez exposé l’application en HTTP depuis votre poste. |
 
 Les six énoncés sont aussi listés dans [l’index des TP](tp/README.md).
@@ -79,7 +79,7 @@ git fetch upstream
 git merge upstream/main
 ```
 
-Facultatif : dans l’onglet Actions de votre fork, GitHub désactive les workflows par défaut. Si vous les activez, chaque push lancera les tests et la construction de l’image sur votre propre dépôt.
+Facultatif : dans l’onglet Actions de votre fork, GitHub désactive les workflows par défaut. Si vous les activez, chaque push lancera les tests et construira l’image ; un push sur `main` la publiera aussi dans votre espace GHCR, sous le tag `latest`. Ce n’est pas nécessaire pour les TP, qui vous font publier l’image à la main.
 
 ## Démarrer le cluster
 

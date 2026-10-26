@@ -4,7 +4,7 @@ Ce TP se fait entièrement sur votre poste, avec Docker. Le cluster Kubernetes e
 
 ## Objectif
 
-À la fin de ce TP, vous saurez lancer l’application Flask, la conteneuriser, construire une image Docker et la publier dans votre registre GHCR. Cette image sera utilisée dans les TP Kubernetes.
+À la fin de ce TP, vous saurez lancer l’application Flask, la conteneuriser, construire une image Docker et la publier dans GHCR, le registre d’images de GitHub. Cette image sera utilisée dans les TP Kubernetes.
 
 ## 1. Découvrir l’application
 

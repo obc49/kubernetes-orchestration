@@ -2,7 +2,7 @@
 
 ## Objectif
 
-Modifier la configuration de l'application, lire ses requests/limits, tester le placement d’un Pod, puis mettre à jour l’application et revenir à la version précédente. Le montage d’un volume emptyDir est proposé en option.
+Modifier la configuration de l'application, lire ses requests et limits puis mesurer sa consommation réelle, tester le placement d’un Pod, comparer un volume temporaire et un volume persistant, enfin mettre à jour l’application et revenir à la version précédente.
 
 ## Prérequis
 

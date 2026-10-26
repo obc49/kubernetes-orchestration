@@ -340,7 +340,7 @@ kubectl -n projet get pvc
 kubectl get pv
 ```
 
-La StorageClass `standard` de Kind affiche `RECLAIMPOLICY: Delete`. Le PV créé pour votre PVC en hérite, et sa colonne `RECLAIM POLICY` l’affiche aussi.
+La StorageClass `standard` de Kind affiche `RECLAIMPOLICY: Delete`. Le volume réellement créé pour répondre à votre PVC est un **PersistentVolume**, un PV : il en hérite, et sa colonne `RECLAIM POLICY` l’affiche aussi.
 
 La suite se déroule en trois temps, qu’il faut distinguer :
 
