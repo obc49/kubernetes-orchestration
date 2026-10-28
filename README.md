@@ -1,6 +1,6 @@
 # Kubernetes — Orchestration des conteneurs
 
-Ce dépôt contient l’application fil rouge, les manifestes et les six TP de la formation. Suivez les TP dans l’ordre : chaque TP réutilise ce qui a été vu précédemment.
+Ce dépôt contient l’application fil rouge, les manifestes et les six TP de la formation. Suivez les TP dans l’ordre : chaque TP réutilise ce qui a été vu précédemment. Seule exception, le TP02 n’a pas besoin de l’image publiée au TP01 : si cette publication coince, vous pouvez enchaîner sur le TP02 et reprendre le TP01 ensuite.
 
 ## Parcours
 
@@ -9,7 +9,7 @@ Ce dépôt contient l’application fil rouge, les manifestes et les six TP de l
 | [TP01](tp/TP01-application-conteneur.md) | Application, Docker et GHCR | Vous avez construit et publié l’image de l’application. |
 | [TP02](tp/TP02-premiers-pas-kubernetes.md) | Premiers pas dans Kubernetes | Vous savez créer un Pod, un namespace et un Service, puis tester avec `port-forward`. |
 | [TP03](tp/TP03-pod-deployment-service.md) | Déployer l’application | Vous avez déployé l’application et corrigé le problème d’accès à une image privée. |
-| [TP04](tp/TP04-configuration-ressources-noeuds.md) | Configuration, ressources et mise à jour | Vous avez modifié un ConfigMap, lu requests et limits puis mesuré la consommation réelle, comparé un volume temporaire et un volume persistant, mis à jour l’application par rolling update et annulé la mise à jour. |
+| [TP04](tp/TP04-configuration-ressources-noeuds.md) | Configuration, ressources, volumes et mise à jour | Vous avez modifié un ConfigMap, lu requests et limits puis mesuré la consommation réelle, comparé un volume temporaire et un volume persistant, mis à jour l’application par rolling update et annulé la mise à jour. |
 | [TP05](tp/TP05-administration-diagnostic-securite.md) | Diagnostic et sécurité | Vous avez diagnostiqué un Service qui a des endpoints mais ne répond pas, vérifié des droits RBAC et éprouvé une NetworkPolicy. |
 | [TP06](tp/TP06-gateway-api.md) | Gateway API | Vous avez exposé l’application en HTTP depuis votre poste. |
 
@@ -25,7 +25,7 @@ Installez et vérifiez les outils suivants avant de commencer :
 - [Docker — installation](https://docs.docker.com/get-started/get-docker/)
 - [kubectl — installation](https://kubernetes.io/docs/tasks/tools/#kubectl)
 - [Kind — installation](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
-- [Helm 3 — installation](https://helm.sh/docs/intro/install/) (utilisé au TP06)
+- [Helm 3 — installation](https://helm.sh/docs/intro/install/) (utilisé au TP06 et dans les TP bonus)
 - [curl — téléchargement](https://curl.se/download.html)
 - [Python 3.11 ou plus récent — téléchargement](https://www.python.org/downloads/) (TP01)
 

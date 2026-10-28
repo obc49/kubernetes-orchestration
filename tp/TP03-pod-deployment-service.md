@@ -116,7 +116,7 @@ kubectl -n kube-training describe deployment flask-app
 
 Le Deployment demande deux réplicas. Le Service `flask-app` sélectionne les Pods qui portent le label attendu.
 
-Le Deployment déclare trois sondes sur ces routes. La startupProbe laisse à l'application le temps de démarrer. La readinessProbe décide si le Pod reçoit du trafic : tant qu'elle échoue, le Service retire le Pod de ses endpoints. La livenessProbe redémarre le conteneur s'il ne répond plus. Observez-les :
+Les routes `/health` et `/ready` testées au TP01 servent maintenant : le Deployment déclare trois sondes qui les interrogent. La startupProbe laisse à l'application le temps de démarrer. La readinessProbe décide si le Pod reçoit du trafic : tant qu'elle échoue, le Service retire le Pod de ses endpoints. La livenessProbe redémarre le conteneur s'il ne répond plus. Observez-les :
 
 ```bash
 kubectl -n kube-training get deployment flask-app -o jsonpath='{.spec.template.spec.containers[0].startupProbe}{"\n"}{.spec.template.spec.containers[0].readinessProbe}{"\n"}{.spec.template.spec.containers[0].livenessProbe}{"\n"}'

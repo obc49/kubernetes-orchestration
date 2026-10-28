@@ -58,6 +58,12 @@ BusyBox est une petite image qui contient notamment un shell et des commandes Li
 kubectl run outil --image=busybox:1.36 -n tp02 -- sleep 3600
 kubectl get pods -n tp02
 kubectl wait --for=condition=Ready pod/outil -n tp02 --timeout=120s
+```
+
+Ouvrez ensuite un shell dans ce Pod. Lancez cette commande seule : elle vous
+place à l’intérieur du conteneur.
+
+```bash
 kubectl exec -it outil -n tp02 -- sh
 ```
 

@@ -81,11 +81,13 @@ Observez les ressources :
 
 ```bash
 kubectl -n kube-training describe pod <nom-du-pod>
-kubectl describe nodes
 kubectl -n kube-training get events --sort-by=.lastTimestamp
 ```
 
-Remplacez `<nom-du-pod>` par le nom réel d’un Pod.
+Remplacez `<nom-du-pod>` par le nom réel d’un Pod. Dans la sortie de `describe
+pod`, cherchez la section `Limits` et `Requests` du conteneur : ce sont les
+valeurs que vous venez de lire dans le manifeste. Le côté nœud vient juste
+après.
 
 ### Mesurer la consommation réelle
 

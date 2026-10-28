@@ -18,7 +18,13 @@ Utiliser les commandes de base pour trouver la cause d’un problème, corriger 
 kubectl -n kube-training get deployment,pods,svc,endpoints
 ```
 
-2. Ouvrez `manifests/30-service.yaml`. Dans une copie nommée `/tmp/service-tp05.yaml`, remplacez temporairement `targetPort: http` par `targetPort: 8080`.
+2. Faites une copie du Service, pour ne pas modifier le manifeste d’origine :
+
+```bash
+cp manifests/30-service.yaml /tmp/service-tp05.yaml
+```
+
+Dans `/tmp/service-tp05.yaml`, remplacez `targetPort: http` par `targetPort: 8080`.
 
 3. Appliquez la copie de test :
 
