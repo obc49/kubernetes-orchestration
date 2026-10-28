@@ -84,7 +84,17 @@ kubectl -n kube-training get secret ghcr-pull
 
 ## 5. Mettre à jour le Deployment
 
-Ouvrez de nouveau `manifests/20-deployment.yaml`. Dans la section `spec.template.spec`, ajoutez les deux lignes `imagePullSecrets` juste avant `containers:`, en respectant exactement l’indentation ci-dessous :
+Ouvrez de nouveau `manifests/20-deployment.yaml`. Vous allez y insérer **ces deux lignes, et seulement elles** :
+
+```yaml
+      imagePullSecrets:
+        - name: ghcr-pull
+```
+
+Elles se placent dans `spec.template.spec`, juste avant la ligne `containers:`
+qui existe déjà. Le résultat doit ressembler à ceci. Attention : `containers:`
+et `- name: flask-app` sont déjà dans le fichier, ne les saisissez pas une
+seconde fois.
 
 ```yaml
     spec:
@@ -94,7 +104,17 @@ Ouvrez de nouveau `manifests/20-deployment.yaml`. Dans la section `spec.template
         - name: flask-app
 ```
 
-Enregistrez le fichier puis réappliquez-le :
+Enregistrez, puis contrôlez tout de suite votre fichier :
+
+```bash
+grep -c "^      containers:" manifests/20-deployment.yaml
+```
+
+La réponse doit être `1`. Si elle est `2`, le bloc a été recopié en entier :
+supprimez le `containers:` et le `- name: flask-app` en trop, sinon `kubectl`
+refusera le fichier pour cause de champ en double.
+
+Réappliquez-le :
 
 ```bash
 kubectl apply -f manifests/20-deployment.yaml
