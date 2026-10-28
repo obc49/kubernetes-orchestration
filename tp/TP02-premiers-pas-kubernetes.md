@@ -120,6 +120,10 @@ curl -I http://localhost:8080
 
 Vous devez recevoir une réponse HTTP de NGINX. Arrêtez le `port-forward` avec `Ctrl+C`.
 
+Dans tous les TP, écrivez `localhost` plutôt que `127.0.0.1` : selon les postes,
+le `port-forward` n’écoute pas sur les deux, et `localhost` trouve la bonne
+adresse dans tous les cas.
+
 ## 7. Observer les labels et les selectors
 
 Affichez les Pods avec leur label :

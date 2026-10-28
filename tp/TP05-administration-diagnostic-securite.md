@@ -38,7 +38,7 @@ Cette fois, le Service a toujours des endpoints et les Pods sont `Ready`, mais l
 ```bash
 kubectl -n kube-training get endpoints flask-app
 kubectl -n kube-training port-forward svc/flask-app 8080:80
-curl -i http://127.0.0.1:8080/health
+curl -i http://localhost:8080/health
 ```
 
 Le test HTTP échoue malgré la présence d’endpoints. Arrêtez le `port-forward` avec `Ctrl+C`. Pour comprendre le routage, retrouvez les labels des Pods et la configuration du Service :

@@ -62,7 +62,7 @@ Si les Pods ne sont pas prêts, revenez au TP03 et corrigez le problème avant d
 Le chemin réseau de ce TP est :
 
 ```text
-Votre poste : 127.0.0.1:8080
+Votre poste : localhost:8080
         |
         v
 kubectl port-forward vers le Service de données NGINX
