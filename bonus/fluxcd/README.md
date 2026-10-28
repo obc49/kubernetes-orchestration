@@ -71,7 +71,11 @@ Une source nommée `flux-system` apparaît : c’est le dépôt que Flux vient d
 
 Le dépôt créé par le bootstrap est **privé** : Git va donc demander une authentification. À l’invite, saisissez votre identifiant GitHub, puis **votre token en guise de mot de passe** — c’est celui que vous venez d’utiliser. Si vous avez déjà configuré un gestionnaire d’identifiants Git ou la commande `gh auth login`, rien ne vous sera demandé.
 
+La première ligne redonne votre identifiant, perdu si vous avez changé de
+terminal pendant le `bootstrap`.
+
 ```bash
+read -p "Identifiant GitHub : " GITHUB_USER
 git clone "https://github.com/$GITHUB_USER/kubernetes-flux-lab.git" ~/kubernetes-flux-lab
 cd ~/kubernetes-flux-lab
 ls clusters/kube-training

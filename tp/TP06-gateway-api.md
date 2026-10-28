@@ -59,26 +59,33 @@ Si le port 8080 est déjà utilisé sur votre poste, remplacez-le par 8081 ou un
 **Terminal 2 :** testez les trois routes :
 
 ```bash
-curl -i -H 'Host: flask.local' http://127.0.0.1:8080/
-curl -i -H 'Host: flask.local' http://127.0.0.1:8080/health
-curl -i -H 'Host: flask.local' http://127.0.0.1:8080/ready
+curl -i -H 'Host: flask.local' http://localhost:8080/
+curl -i -H 'Host: flask.local' http://localhost:8080/health
+curl -i -H 'Host: flask.local' http://localhost:8080/ready
 ```
 
 La HTTPRoute ne répond que pour le nom d’hôte `flask.local`. Vérifiez le cas négatif :
 
 ```bash
-curl -i http://127.0.0.1:8080/
+curl -i http://localhost:8080/
 ```
 
 Sans l’en-tête `Host: flask.local`, la requête ne correspond pas à la route et doit retourner `404`. Avec `curl`, il n’est pas nécessaire de modifier le fichier hosts : l’en-tête `Host` suffit.
 
-Facultatif, pour tester depuis un navigateur : ajoutez la ligne suivante dans le fichier hosts (`/etc/hosts` sous Linux/WSL, ou `C:\Windows\System32\drivers\etc\hosts` sous Windows) :
+Facultatif, pour tester depuis un navigateur. Le navigateur ne peut pas forcer
+l’en-tête `Host` : il faut donc que `flask.local` se résolve chez lui, par une
+ligne dans le fichier hosts **du système qui fait tourner le navigateur** —
+celui de Windows si vous êtes sous WSL2, `/etc/hosts` sinon. Dans les deux cas,
+il faut des droits d’administration.
 
 ```text
 127.0.0.1 flask.local
 ```
 
-Puis ouvrez `http://flask.local:8080/`, ou le port local que vous avez choisi. Sans cette ligne, le navigateur ne peut pas envoyer le nom d’hôte attendu par la HTTPRoute.
+Puis ouvrez `http://flask.local:8080/`, ou le port local que vous avez choisi.
+
+Si vous n’avez pas ces droits, ou si le nom ne se résout pas, passez cette
+étape : le test `curl` ci-dessus démontre exactement la même chose.
 
 ## 4. Si cela ne fonctionne pas
 
