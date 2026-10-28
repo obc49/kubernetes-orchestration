@@ -58,12 +58,6 @@ flux bootstrap github \
 
 La commande installe les contrôleurs Flux, crée le dépôt `kubernetes-flux-lab` s’il n’existe pas, et y écrit le répertoire `clusters/kube-training/flux-system`. Suivez les messages jusqu’à la fin.
 
-Effacez le token de votre environnement :
-
-```bash
-unset GITHUB_TOKEN
-```
-
 Vérifiez ce que Flux surveille déjà :
 
 ```bash
@@ -75,6 +69,8 @@ Une source nommée `flux-system` apparaît : c’est le dépôt que Flux vient d
 
 ## 3. Récupérer le dépôt en local
 
+Le dépôt créé par le bootstrap est **privé** : Git va donc demander une authentification. À l’invite, saisissez votre identifiant GitHub, puis **votre token en guise de mot de passe** — c’est celui que vous venez d’utiliser. Si vous avez déjà configuré un gestionnaire d’identifiants Git ou la commande `gh auth login`, rien ne vous sera demandé.
+
 ```bash
 git clone "https://github.com/$GITHUB_USER/kubernetes-flux-lab.git" ~/kubernetes-flux-lab
 cd ~/kubernetes-flux-lab
@@ -82,6 +78,14 @@ ls clusters/kube-training
 ```
 
 Vous devez voir le répertoire `flux-system`. Ne le modifiez pas : il appartient à Flux.
+
+Le token n’a plus à rester dans votre environnement :
+
+```bash
+unset GITHUB_TOKEN
+```
+
+Les `git push` des étapes suivantes redemanderont cette authentification, sauf si un gestionnaire d’identifiants la mémorise.
 
 ## 4. Décrire l’application dans le dépôt
 

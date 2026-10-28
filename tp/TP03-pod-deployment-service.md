@@ -6,7 +6,7 @@ Déployer l’application Flask du TP01 dans le cluster, comprendre le rôle du 
 
 ## Prérequis
 
-- TP01 terminé : votre image est publiée dans GHCR. Gardez son adresse complète sous la main, par exemple `ghcr.io/mon-compte/kubernetes-orchestration:tp01-1`.
+- TP01 terminé : votre image est publiée dans GHCR. Gardez son adresse complète sous la main, par exemple `ghcr.io/VOTRE-IDENTIFIANT/kubernetes-orchestration:tp01-1`.
 - TP02 terminé : vous savez utiliser `kubectl`, un namespace, un Pod, un Service et `port-forward`.
 - Le cluster Kind est démarré.
 
@@ -30,7 +30,7 @@ Ouvrez `manifests/20-deployment.yaml`. Remplacez la valeur du champ `image:` par
 Exemple :
 
 ```yaml
-image: ghcr.io/mon-compte/kubernetes-orchestration:tp01-1
+image: ghcr.io/VOTRE-IDENTIFIANT/kubernetes-orchestration:tp01-1
 ```
 
 Enregistrez le fichier. Ne mettez aucun token dans le manifeste.
