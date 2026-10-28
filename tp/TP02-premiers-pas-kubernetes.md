@@ -6,9 +6,10 @@ Créer un namespace, lancer un Pod avec une image publique, l’identifier avec 
 
 ## Prérequis
 
-- TP01 terminé.
 - Docker fonctionne sur votre poste.
 - Kind et `kubectl` sont installés et répondent.
+
+Ce TP n’utilise que des images publiques : il ne dépend pas de l’image que vous publiez au TP01. Si la publication a coincé, poursuivez ici et reprenez le TP01 ensuite — c’est le TP03 qui aura besoin de votre image.
 
 ## 1. Vérifier le cluster
 
@@ -89,10 +90,12 @@ et plus riche, les EndpointSlice :
 kubectl get endpointslices -n tp02
 ```
 
-`Endpoints` est l’API d’origine ; c’est elle que nous lisons dans ces TP parce
-que sa sortie tient sur une ligne. `EndpointSlice` est celle que Kubernetes
-utilise réellement aujourd’hui et que vous rencontrerez en production : elle
-découpe les adresses en tranches et porte des informations que l’objet
+Les deux coexistent et décrivent les mêmes adresses. `Endpoints` est l’API
+d’origine : elle est dépréciée depuis Kubernetes 1.33 mais reste pleinement
+prise en charge et ne sera pas supprimée ; nous la lisons dans ces TP parce que
+sa sortie tient sur une ligne. `EndpointSlice`, stable depuis Kubernetes 1.21,
+est l’API recommandée et celle qu’alimentent les implémentations modernes :
+elle découpe les adresses en tranches et porte des informations que l’objet
 `Endpoints` ne sait pas représenter.
 
 ## 6. Accéder au Service depuis votre poste
@@ -153,7 +156,7 @@ La suppression du namespace supprime les ressources qu’il contient.
 - Les labels identifient des ressources ; les selectors permettent de les retrouver.
 - Un Service sélectionne les Pods par leurs labels.
 - `port-forward` ouvre un accès temporaire depuis votre poste ; ce n’est pas une exposition de production.
-- `Endpoints` et `EndpointSlice` décrivent les mêmes adresses : la première est l’API d’origine, la seconde celle que Kubernetes utilise aujourd’hui.
+- `Endpoints` et `EndpointSlice` décrivent les mêmes adresses : la première est l’API d’origine, dépréciée mais conservée ; la seconde est l’API recommandée aujourd’hui.
 
 ## Questions
 

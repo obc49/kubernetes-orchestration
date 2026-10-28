@@ -470,7 +470,7 @@ kubectl -n kube-training rollout history deployment/flask-app
 
 Vous devez voir l’ancien ReplicaSet et le nouveau. Kubernetes remplace progressivement les Pods selon la stratégie de mise à jour du Deployment.
 
-Ce Deployment ne déclare pas de stratégie : il utilise donc le défaut, `RollingUpdate`, avec au plus 25 % de Pods en surplus et 25 % indisponibles. C'est ce qui fait que les deux répliques sont remplacées l'une après l'autre, sans coupure.
+Ce Deployment ne déclare pas de stratégie : il utilise donc le défaut, `RollingUpdate`, avec au plus 25 % de Pods en surplus et 25 % indisponibles. Sur deux répliques, cela autorise un Pod en plus et vise zéro indisponible : les répliques sont donc remplacées l'une après l'autre. Ce calcul cadence le remplacement, il ne garantit pas pour autant l'absence de coupure — une requête en cours peut être perdue, et un nouveau Pod n'absorbe du trafic qu'une fois `Ready`.
 
 Vérifiez le nouveau titre avant le rollback :
 

@@ -6,6 +6,20 @@ Ce TP se fait entièrement sur votre poste, avec Docker. Le cluster Kubernetes e
 
 À la fin de ce TP, vous saurez lancer l’application Flask, la conteneuriser, construire une image Docker et la publier dans GHCR, le registre d’images de GitHub. Cette image sera utilisée dans les TP Kubernetes.
 
+## Prérequis
+
+- Vous avez forké le dépôt et cloné **votre fork**, comme décrit dans le [README](../README.md).
+- `git`, `docker` et `python3` répondent sur votre poste. Vérifiez-le maintenant, pas au milieu du TP :
+
+```bash
+git --version
+docker version
+python3 --version
+```
+
+- Docker doit pouvoir démarrer des conteneurs. Si `docker version` affiche une erreur de connexion au daemon, corrigez Docker avant de commencer.
+- Vous avez un compte GitHub et vous saurez y créer un token. C’est l’étape 3 de ce TP, et c’est celle qui demande le plus d’attention.
+
 ## 1. Découvrir l’application
 
 Depuis la racine du dépôt :
