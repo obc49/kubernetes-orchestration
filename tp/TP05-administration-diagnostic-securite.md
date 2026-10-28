@@ -201,7 +201,7 @@ Remplacez `<nom-du-worker>` par le nom d’un nœud. Dans la sortie de `describe
 
 **Node Problem Detector** est un composant qui surveille le nœud lui-même, par exemple le noyau, le disque ou le runtime des conteneurs. Il remonte les problèmes détectés sous forme de conditions et d’événements Kubernetes. Il n’est pas installé dans ce lab.
 
-**Google Cloud Operations** (anciennement Stackdriver) est un exemple d’outillage de supervision proposé par un fournisseur cloud. Il peut centraliser les journaux, les métriques et les alertes d’un environnement cloud. Il n’est pas installé dans ce lab.
+**kube-prometheus-stack** est l’ensemble le plus répandu pour aller plus loin : Prometheus collecte et conserve les métriques dans la durée, Alertmanager déclenche les notifications, Grafana les affiche. C’est ce qui manque à `metrics-server`, qui ne retient rien et n’alerte sur rien. Il n’est pas installé dans ce lab.
 
 Distinguez ces quatre notions :
 
