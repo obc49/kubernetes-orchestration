@@ -116,7 +116,7 @@ docker push "$IMAGE:$TAG"
 
 Vérifiez que la publication est terminée dans GitHub → Packages. Ouvrez **Package settings** et vérifiez que la visibilité du package est **Private**. Si nécessaire, changez-la avant de poursuivre. Le TP03 s’appuie sur un package privé pour vous faire observer le problème de téléchargement puis le corriger.
 
-Notez l’adresse exacte de votre image, par exemple `ghcr.io/mon-compte/kubernetes-orchestration:tp01-1`. Vous en aurez besoin au TP03.
+Notez l’adresse exacte de votre image, par exemple `ghcr.io/VOTRE-IDENTIFIANT/kubernetes-orchestration:tp01-1`. Vous en aurez besoin au TP03.
 
 ## 5. Nettoyer le poste
 
