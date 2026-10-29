@@ -58,6 +58,12 @@ BusyBox est une petite image qui contient notamment un shell et des commandes Li
 kubectl run outil --image=busybox:1.36 -n tp02 -- sleep 3600
 kubectl get pods -n tp02
 kubectl wait --for=condition=Ready pod/outil -n tp02 --timeout=120s
+```
+
+Ouvrez ensuite un shell dans ce Pod. Lancez cette commande seule : elle vous
+place à l’intérieur du conteneur.
+
+```bash
 kubectl exec -it outil -n tp02 -- sh
 ```
 
@@ -113,6 +119,10 @@ curl -I http://localhost:8080
 ```
 
 Vous devez recevoir une réponse HTTP de NGINX. Arrêtez le `port-forward` avec `Ctrl+C`.
+
+Dans tous les TP, écrivez `localhost` plutôt que `127.0.0.1` : selon les postes,
+le `port-forward` n’écoute pas sur les deux, et `localhost` trouve la bonne
+adresse dans tous les cas.
 
 ## 7. Observer les labels et les selectors
 

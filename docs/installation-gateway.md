@@ -20,7 +20,7 @@ Nous utilisons NGINX Gateway Fabric 2.7.2 pour ce lab. Gateway API n’est pas l
 kubectl kustomize "https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.7.2" | kubectl apply -f -
 ```
 
-Cette commande installe le canal standard de Gateway API, soit onze définitions de ressources : Gateway API est une famille de types de routes, et HTTPRoute n'en est qu'un. Les TP n'utilisent que GatewayClass, Gateway et HTTPRoute. Le canal standard ne contient que ce qui est stabilisé ; le canal expérimental existe à part.
+Cette commande installe le canal standard de Gateway API, soit dix définitions de ressources, plus une règle de validation qui n'en est pas une : Gateway API est une famille de types de routes, et HTTPRoute n'en est qu'un. Vous pouvez les recompter avec `kubectl get crd | grep gateway`. Les TP n'utilisent que GatewayClass, Gateway et HTTPRoute. Le canal standard ne contient que ce qui est stabilisé ; le canal expérimental existe à part.
 
 ## 3. Installer NGINX Gateway Fabric avec Helm
 
@@ -62,7 +62,7 @@ Si les Pods ne sont pas prêts, revenez au TP03 et corrigez le problème avant d
 Le chemin réseau de ce TP est :
 
 ```text
-Votre poste : 127.0.0.1:8080
+Votre poste : localhost:8080
         |
         v
 kubectl port-forward vers le Service de données NGINX
@@ -100,7 +100,7 @@ dans la commande suivante, à la place de `<nom-du-deployment>` :
 kubectl -n nginx-gateway logs deployment/<nom-du-deployment> --tail=50
 ```
 
-Le NodePort 30080 est configuré pour montrer ce que serait le point d’entrée du trafic sur un vrai cluster, mais les TP ne passent pas par lui : l’accès HTTP se fait en port-forward, ce qui évite de dépendre d’un port fixe de votre poste. S’il n’apparait pas, vous pouvez poursuivre.
+Le NodePort 30080 est configuré pour montrer ce que serait le point d’entrée du trafic sur un vrai cluster, mais les TP ne passent pas par lui : l’accès HTTP se fait en port-forward, ce qui évite de dépendre d’un port fixe de votre poste. S’il n’apparaît pas, vous pouvez poursuivre.
 
 ## Version et limites du lab
 

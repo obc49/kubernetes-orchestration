@@ -81,11 +81,13 @@ Observez les ressources :
 
 ```bash
 kubectl -n kube-training describe pod <nom-du-pod>
-kubectl describe nodes
 kubectl -n kube-training get events --sort-by=.lastTimestamp
 ```
 
-Remplacez `<nom-du-pod>` par le nom réel d’un Pod.
+Remplacez `<nom-du-pod>` par le nom réel d’un Pod. Dans la sortie de `describe
+pod`, cherchez la section `Limits` et `Requests` du conteneur : ce sont les
+valeurs que vous venez de lire dans le manifeste. Le côté nœud vient juste
+après.
 
 ### Mesurer la consommation réelle
 
@@ -174,7 +176,7 @@ Remplacez `<nom-du-worker>` par le nom d’un nœud worker.
   leur consommation.
 - `top node` affiche la consommation **réelle**, mesurée.
 
-Répondez :
+Questions :
 
 - Que consomme réellement un Pod de l’application, comparé aux `requests: cpu:
   100m` déclarées ?
@@ -472,6 +474,18 @@ Vous devez voir l’ancien ReplicaSet et le nouveau. Kubernetes remplace progres
 
 Ce Deployment ne déclare pas de stratégie : il utilise donc le défaut, `RollingUpdate`, avec au plus 25 % de Pods en surplus et 25 % indisponibles. Sur deux répliques, cela autorise un Pod en plus et vise zéro indisponible : les répliques sont donc remplacées l'une après l'autre. Ce calcul cadence le remplacement, il ne garantit pas pour autant l'absence de coupure — une requête en cours peut être perdue, et un nouveau Pod n'absorbe du trafic qu'une fois `Ready`.
 
+La colonne `CHANGE-CAUSE` affiche `<none>` : l’historique dit qu’il y a eu des
+révisions, pas pourquoi. Renseignez-la, puis relisez l’historique :
+
+```bash
+kubectl -n kube-training annotate --overwrite deployment flask-app \
+  kubernetes.io/change-cause="Mise à jour de l'image vers tp04-2"
+kubectl -n kube-training rollout history deployment/flask-app
+```
+
+C’est le message de commit de votre déploiement. Sans lui, la personne qui devra
+décider d’un retour arrière ne saura pas vers quelle révision revenir.
+
 Vérifiez le nouveau titre avant le rollback :
 
 ```bash
@@ -481,7 +495,7 @@ kubectl -n kube-training port-forward svc/flask-app 8080:80
 Dans un autre terminal :
 
 ```bash
-curl -s http://127.0.0.1:8080/ | grep '<title>'
+curl -s http://localhost:8080/ | grep '<title>'
 ```
 
 Le titre doit contenir `TP04-2`. Arrêtez le `port-forward` avec `Ctrl+C` avant de poursuivre.
@@ -502,7 +516,7 @@ kubectl -n kube-training port-forward svc/flask-app 8080:80
 Dans un autre terminal :
 
 ```bash
-curl -s http://127.0.0.1:8080/ | grep '<title>'
+curl -s http://localhost:8080/ | grep '<title>'
 ```
 
 Avant le `rollout undo`, le titre contient `TP04-2`. Après le `rollout undo`, il ne le contient plus. Arrêtez le `port-forward` avec `Ctrl+C`. Si le port 8080 est déjà utilisé, choisissez un autre port local libre.

@@ -113,12 +113,21 @@ Si la connexion échoue, vérifiez les droits du token et l’accès au package.
 
 ## 4. Construire et publier votre image
 
-Choisissez un tag unique pour votre image :
+Composez l’adresse de votre image et choisissez un tag. La première ligne
+redonne votre identifiant, perdu si vous avez changé de terminal :
 
 ```bash
+read -p "Identifiant GitHub : " GHCR_USER
 export OWNER="$GHCR_USER"
 export IMAGE="ghcr.io/$OWNER/kubernetes-orchestration"
 export TAG="tp01-1"
+```
+
+Contrôlez l’adresse obtenue. Un trou, comme `ghcr.io//kubernetes-orchestration`,
+signale un identifiant non saisi :
+
+```bash
+echo "$IMAGE:$TAG"
 ```
 
 Construisez, taguez et publiez l’image :
