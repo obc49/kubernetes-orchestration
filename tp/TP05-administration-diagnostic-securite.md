@@ -169,7 +169,7 @@ kubectl -n kube-training get networkpolicy
 kubectl -n kube-training exec client -- wget -qO- http://flask-app/health
 ```
 
-**La requête est bien toujours.** Car la CNI kindnet de Kind supporte desormais les network policies ce qui n'etait pas la cas avant.
+**La requête est bien autorisée.** Car la CNI kindnet de Kind supporte desormais les network policies ce qui n'etait pas la cas avant.
 
 
 4. Nettoyez :
