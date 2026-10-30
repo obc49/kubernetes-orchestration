@@ -169,9 +169,8 @@ kubectl -n kube-training get networkpolicy
 kubectl -n kube-training exec client -- wget -qO- http://flask-app/health
 ```
 
-**La requête passe toujours.** Le manifeste est pourtant valide, accepté par l’API, et visible dans `get networkpolicy`. C’est tout le propos de cette partie : dans la configuration réseau par défaut de ce lab Kind, les NetworkPolicy sont stockées sans être appliquées. Sur un cluster équipé d’un CNI qui les met en œuvre, comme Calico ou Cilium, la même règle aurait coupé le flux — et Kind lui-même peut être configuré ainsi, en désactivant son plugin par défaut pour en installer un autre.
+**La requête est bien toujours.** Car la CNI kindnet de Kind supporte desormais les network policies ce qui n'etait pas la cas avant.
 
-Retenez la méthode : une règle de sécurité réseau ne se vérifie pas en relisant son manifeste, elle se vérifie en tentant le flux qu’elle est censée interdire.
 
 4. Nettoyez :
 
